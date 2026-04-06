@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-primary: #5a0200;
+  --color-primary-light: #7a0300;
+  --color-secondary: #d6b575;
+  --color-accent: #a08c8c;
+  --color-success: #10b981;
+  --color-danger: #ef4444;
+  --color-surface: #1a0100;
+  
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+:root {
+  --background: #fdf2f2;
+  --foreground: #2d0100;
+  --card: #ffffff;
+  --card-foreground: #2d0100;
+  --primary: #5a0200;
+  --secondary: #d6b575;
+  --border: #f3e1e1;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0d0000;
+    --foreground: #fdf2f2;
+    --card: #1a0100;
+    --card-foreground: #fdf2f2;
+    --border: #2d0100;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-dark {
+  background: rgba(90, 2, 0, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.maroon-gradient {
+  background: linear-gradient(135deg, #5a0200 0%, #7a0300 100%);
+}
+
+.gold-text {
+  background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
