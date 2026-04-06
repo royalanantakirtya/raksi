@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#390b0b" />
+    <link rel="icon" href="assets/icon-192.png" type="image/png" />
+
+    <!-- Tailwind -->
+    <link href="./css/style.css" rel="stylesheet" />
+
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Google Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex items-center justify-center min-h-screen font-primary"
+  >
+    <div
+      class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg w-96 p-8 flex flex-col items-center gap-4"
+    >
+      <!-- Logo -->
+      <img src="assets/logo-rak.png" alt="Royal" class="h-10" />
+
+      <!-- Title -->
+      <h1 class="text-2xl font-bold text-primary dark:text-gray-100">
+        Selamat Datang
+      </h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400 text-center">
+        Silakan masuk untuk menggunakan aplikasi
+      </p>
+
+      <!-- Form -->
+      <form class="w-full flex flex-col gap-4">
+        <!-- Username -->
+        <div class="relative flex items-center">
+          <span
+            class="material-symbols-rounded absolute left-3 text-gray-400 dark:text-gray-500 [font-variation-settings:'FILL'_0,'wght'_400,'GRAD'_0,'opsz'_24']"
+          >
+            person
+          </span>
+          <input
+            type="text"
+            id="usernameInput"
+            placeholder="Username"
+            required
+            class="w-full pl-10 pr-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-primary focus:outline-none bg-transparent dark:focus:ring-slate-100"
+          />
+        </div>
+
+        <!-- Password -->
+        <div class="relative flex items-center">
+          <span
+            class="material-symbols-rounded absolute left-3 text-gray-400 dark:text-gray-500 [font-variation-settings:'FILL'_0,'wght'_400,'GRAD'_0,'opsz'_24']"
+          >
+            lock
+          </span>
+          <input
+            type="password"
+            id="passwordInput"
+            placeholder="Password"
+            required
+            class="w-full pl-10 pr-10 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-primary focus:outline-none bg-transparent dark:focus:ring-slate-100"
+          />
+          <span
+            class="material-symbols-rounded absolute right-3 cursor-pointer text-gray-400 dark:text-gray-500 [font-variation-settings:'FILL'_0,'wght'_400,'GRAD'_0,'opsz'_24']"
+            onclick="togglePassword(this)"
+          >
+            visibility
+          </span>
+        </div>
+
+        <!-- Button -->
+        <button
+          type="submit"
+          onclick="
+            login();
+            return false;
+          "
+          class="bg-primary dark:bg-secondary font-bold text-white rounded-lg py-2 flex items-center justify-center gap-2 hover:opacity-90 transition"
+        >
+          Masuk
+          <span
+            class="material-symbols-rounded text-sm [font-variation-settings:'FILL'_0,'wght'_400,'GRAD'_0,'opsz'_24']"
+            >login</span
+          >
+        </button>
+      </form>
+    </div>
+
+    <script>
+      function togglePassword(icon) {
+        const input = document.getElementById("passwordInput");
+        if (input.type === "password") {
+          input.type = "text";
+          icon.textContent = "visibility_off";
+        } else {
+          input.type = "password";
+          icon.textContent = "visibility";
+        }
+      }
+
+      async function login() {
+        const username = document.getElementById("usernameInput").value.trim();
+        const password = document.getElementById("passwordInput").value.trim();
+
+        if (!username || !password) {
+          alert("Mohon isi username dan password");
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            `http://localhost:3000/users?kode=${username}&password=${password}`,
+          );
+          const users = await response.json();
+
+          if (users.length > 0) {
+            const user = users[0];
+            localStorage.setItem("user", JSON.stringify(user));
+            window.location.href = "app.html";
+          } else {
+            alert("Username atau password salah");
+          }
+        } catch (err) {
+          console.error(err);
+          alert("Gagal terhubung ke server JSON");
+        }
+      }
+    </script>
+  </body>
+</html>

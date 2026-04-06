@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Checklist Kunjungan</title>
+
+    <!-- Tailwind -->
+    <link href="./css/style.css" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Google Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    class="font-primary bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col text-gray-900 dark:text-gray-100"
+  >
+    <!-- Header -->
+    <header
+      class="w-full bg-primary dark:bg-secondary text-gray-100 flex items-center px-4 py-3 shadow"
+    >
+      <img src="assets/logo-rak.png" alt="Royal" class="h-8 w-auto" />
+      <h1 class="flex-1 text-center text-lg font-semibold">
+        Checklist Kunjungan
+      </h1>
+      <!-- Tombol back -->
+      <button
+        onclick="goBack()"
+        class="border border-white/40 rounded-full p-1 flex items-center justify-center"
+      >
+        <span class="material-symbols-rounded text-gray-100 cursor-pointer"
+          >close</span
+        >
+      </button>
+    </header>
+
+    <!-- Main content -->
+    <main class="flex-1 w-full px-4 py-6 space-y-4">
+      <!-- Nama Lokasi -->
+      <div
+        id="namaLokasi"
+        class="bg-white dark:bg-gray-800 border border-gray-700 rounded-lg shadow p-4 text-center font-semibold text-lg text-primary dark:text-gray-100"
+      >
+        <!-- nama lokasi dari URL -->
+      </div>
+
+      <!-- Kondisi Lokasi -->
+      <details
+        id="section-kondisi"
+        class="border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-700 shadow p-4"
+      >
+        <summary
+          class="font-semibold cursor-pointer flex items-center justify-between"
+        >
+          <span>Kondisi Lokasi</span>
+          <span
+            class="check-icon material-symbols-rounded text-green-500 !hidden"
+          >
+            check_circle
+          </span>
+        </summary>
+        <div class="mt-4 space-y-2">
+          <label class="flex flex-col text-sm">
+            <span class="mb-2"
+              >Kondisi LCD Monitor <span class="text-red-600">*</span></span
+            >
+            <select
+              class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:border-gray-600"
+              required
+            >
+              <option>-</option>
+              <option>Baik</option>
+              <option>Mati Total</option>
+              <option>Tertempel Tulisan</option>
+            </select>
+          </label>
+
+          <label class="flex flex-col text-sm">
+            <span class="mb-2"
+              >Kondisi AC <span class="text-red-600">*</span></span
+            >
+            <select
+              class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:border-gray-600"
+              required
+            >
+              <option>-</option>
+              <option>Dingin</option>
+              <option>Tidak Dingin</option>
+              <option>Bocor</option>
+              <option>Mati Total</option>
+            </select>
+          </label>
+
+          <label class="flex flex-col text-sm">
+            <span class="mb-2"
+              >Fascia Bagian Atas Mesin
+              <span class="text-red-600">*</span></span
+            >
+            <select
+              class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:border-gray-600"
+              required
+            >
+              <option>-</option>
+              <option>Terkunci dan Rapat</option>
+              <option>Terkunci dan Renggang</option>
+              <option>Tidak Terkunci</option>
+            </select>
+          </label>
+
+          <label class="flex flex-col text-sm">
+            <span class="mb-2"
+              >Fascia Bagian Bawah Mesin
+              <span class="text-red-600">*</span></span
+            >
+            <select
+              class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:border-gray-600"
+              required
+            >
+              <option>-</option>
+              <option>Terkunci dan Rapat</option>
+              <option>Terkunci dan Renggang</option>
+              <option>Tidak Terkunci</option>
+            </select>
+          </label>
+
+          <label class="flex flex-col text-sm">
+            <span class="mb-2"
+              >Kondisi Lampu Booth Akrilik
+              <span class="text-red-600">*</span></span
+            >
+            <select
+              class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:border-gray-600"
+              required
+            >
+              <option>-</option>
+              <option>Hidup</option>
+              <option>Mati</option>
+            </select>
+          </label>
+
+          <label class="flex flex-col text-sm">
+            <span class="mb-2"
+              >Pintu Booth / Kerangkeng
+              <span class="text-red-600">*</span></span
+            >
+            <select
+              class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:border-gray-600"
+              required
+            >
+              <option>-</option>
+              <option>Terkunci</option>
+              <option>Tidak Terkunci</option>
+            </select>
+          </label>
+
+          <label class="flex flex-col text-sm">
+            <span class="mb-2"
+              >Tempat Sampah <span class="text-red-600">*</span></span
+            >
+            <select
+              class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:border-gray-600"
+              required
+            >
+              <option>-</option>
+              <option>Ada</option>
+              <option>Tidak Ada</option>
+            </select>
+          </label>
+
+          <label class="flex flex-col text-sm">
+            <span class="mb-2"
+              >Stiker ID ATM <span class="text-red-600">*</span></span
+            >
+            <select
+              class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:border-gray-600"
+              required
+            >
+              <option>-</option>
+              <option>Ada</option>
+              <option>Tidak Ada</option>
+            </select>
+          </label>
+
+          <label class="flex flex-col text-sm">
+            <span class="mb-2"
+              >Stiker Denom <span class="text-red-600">*</span></span
+            >
+            <select
+              class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:border-gray-600"
+              required
+            >
+              <option>-</option>
+              <option>Ada</option>
+              <option>Tidak Ada</option>
+            </select>
+          </label>
+
+          <label class="flex flex-col text-sm">
+            <span class="mb-2"
+              >Stiker Kaca / Pintu <span class="text-red-600">*</span></span
+            >
+            <select
+              class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:border-gray-600"
+              required
+            >
+              <option>-</option>
+              <option>Baik</option>
+              <option>Tidak Baik</option>
+            </select>
+          </label>
+
+          <label class="flex flex-col text-sm">
+            <span class="mb-2"
+              >Kondisi Pintu / Ruangan <span class="text-red-600">*</span></span
+            >
+            <select
+              class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:border-gray-600"
+              required
+            >
+              <option>-</option>
+              <option>Baik</option>
+              <option>Tidak Baik</option>
+            </select>
+          </label>
+
+          <label class="flex flex-col text-sm">
+            <span class="mb-2"
+              >Kondisi Instalasi Kabel <span class="text-red-600">*</span></span
+            >
+            <select
+              class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:border-gray-600"
+              required
+            >
+              <option>-</option>
+              <option>Rapi</option>
+              <option>Tidak Rapi</option>
+            </select>
+          </label>
+
+          <label class="flex flex-col text-sm">
+            <span class="mb-2"
+              >Plafond <span class="text-red-600">*</span></span
+            >
+            <select
+              class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:border-gray-600"
+              required
+            >
+              <option>-</option>
+              <option>Baik</option>
+              <option>Tidak Baik</option>
+            </select>
+          </label>
+
+          <label class="flex flex-col text-sm">
+            <span class="mb-2"
+              >Lampu Ruangan <span class="text-red-600">*</span></span
+            >
+            <select
+              class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:border-gray-600"
+              required
+            >
+              <option>-</option>
+              <option>Hidup</option>
+              <option>Redup</option>
+              <option>Mati</option>
+              <option>Tidak Ada Lampu</option>
+            </select>
+          </label>
+
+          <label class="flex flex-col text-sm">
+            <span class="mb-2"
+              >Dinding Ruangan <span class="text-red-600">*</span></span
+            >
+            <select
+              class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:border-gray-600"
+              required
+            >
+              <option>-</option>
+              <option>Baik</option>
+              <option>Tidak Baik</option>
+            </select>
+          </label>
+
+          <label class="flex flex-col text-sm">
+            <span class="mb-2"
+              >Lantai Ruangan <span class="text-red-600">*</span></span
+            >
+            <select
+              class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:border-gray-600"
+              required
+            >
+              <option>-</option>
+              <option>Baik</option>
+              <option>Tidak Baik</option>
+            </select>
+          </label>
+
+          <label class="flex flex-col text-sm">
+            <span class="mb-2"
+              >ID Pelanggan KWH Meter <span class="text-red-600">*</span></span
+            >
+            <select
+              class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:border-gray-600"
+              required
+            >
+              <option>-</option>
+              <option>Sesuai</option>
+              <option>Tidak Sesuai</option>
+            </select>
+          </label>
+
+          <label class="flex flex-col text-sm">
+            <span class="mb-2"
+              >Sisa Token Listrik <span class="text-red-600">*</span></span
+            >
+            <input
+              type="number"
+              class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:border-gray-600"
+              required
+              placeholder="Masukkan sisa token"
+            />
+          </label>
+        </div>
+      </details>
+
+      <!-- Visual Lokasi -->
+      <details
+        id="section-visual"
+        class="border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-700 shadow p-4"
+      >
+        <summary
+          class="font-semibold cursor-pointer flex items-center justify-between"
+        >
+          <span>Visual Lokasi</span>
+          <span
+            class="check-icon material-symbols-rounded text-green-500 !hidden"
+          >
+            check_circle
+          </span>
+        </summary>
+        <div class="mt-4 space-y-2">
+          <label class="flex flex-col text-sm">
+            <span class="mb-2"
+              >Foto Mesin <span class="text-red-600">*</span></span
+            >
+            <input
+              id="fotoMesin"
+              type="file"
+              accept="image/*"
+              capture="camera"
+              required
+              class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:border-gray-600"
+            />
+          </label>
+
+          <label class="flex flex-col text-sm">
+            <span class="mb-2"
+              >Foto Ruangan <span class="text-red-600">*</span></span
+            >
+            <input
+              id="fotoRuangan"
+              type="file"
+              accept="image/*"
+              capture="camera"
+              required
+              class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:border-gray-600"
+            />
+          </label>
+
+          <label class="flex flex-col text-sm">
+            <span class="mb-2"
+              >Foto Lantai <span class="text-red-600">*</span></span
+            >
+            <input
+              id="fotoLantai"
+              type="file"
+              accept="image/*"
+              capture="camera"
+              required
+              class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:border-gray-600"
+            />
+          </label>
+
+          <label class="flex flex-col text-sm">
+            <span class="mb-2"
+              >Foto Tempat Sampah <span class="text-red-600">*</span></span
+            >
+            <input
+              id="fotoSampah"
+              type="file"
+              accept="image/*"
+              capture="camera"
+              required
+              class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:border-gray-600"
+            />
+          </label>
+
+          <label class="flex flex-col text-sm">
+            <span class="mb-2"
+              >Foto Kaca Ruangan <span class="text-red-600">*</span></span
+            >
+            <input
+              id="fotoKaca"
+              type="file"
+              accept="image/*"
+              capture="camera"
+              required
+              class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:border-gray-600"
+            />
+          </label>
+
+          <label class="flex flex-col text-sm">
+            <span class="mb-2"
+              >Foto Atas Booth <span class="text-red-600">*</span></span
+            >
+            <input
+              id="fotoBooth"
+              type="file"
+              accept="image/*"
+              capture="camera"
+              required
+              class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:border-gray-600"
+            />
+          </label>
+
+          <label class="flex flex-col text-sm">
+            <span class="mb-2">Foto KWH Meter</span>
+            <input
+              id="fotoMeteran"
+              type="file"
+              accept="image/*"
+              capture="camera"
+              class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:border-gray-600"
+            />
+          </label>
+        </div>
+      </details>
+
+      <!-- Temuan Permasalahan -->
+      <details
+        id="section-temuan"
+        class="border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-700 shadow p-4"
+      >
+        <summary
+          class="font-semibold cursor-pointer flex items-center justify-between"
+        >
+          <span>Temuan Permasalahan</span>
+          <span
+            class="check-icon material-symbols-rounded text-green-500 !hidden"
+          >
+            check_circle
+          </span>
+        </summary>
+        <div id="temuanContainer" class="mt-2 space-y-2">
+          <!-- Card temuan baru akan ditambahkan di sini -->
+        </div>
+        <div class="mt-4">
+          <button
+            type="button"
+            id="btnTambahTemuan"
+            class="bg-primary text-gray-100 px-4 py-2 rounded-lg cursor-pointer"
+          >
+            + Tambah Temuan
+          </button>
+        </div>
+      </details>
+    </main>
+
+    <!-- Footer Action -->
+    <footer
+      class="w-full px-4 py-3 bg-white dark:bg-gray-800 border-t dark:border-gray-700 flex justify-between items-center"
+    >
+      <div
+        id="durationDisplay"
+        class="text-sm font-semibold text-gray-700 dark:text-gray-300"
+      >
+        Durasi: 0 menit
+      </div>
+
+      <button
+        id="saveBtn"
+        class="bg-primary text-gray-100 px-6 py-2 rounded-lg shadow opacity-50 cursor-not-allowed"
+        disabled
+      >
+        Simpan
+      </button>
+    </footer>
+
+    <script src="js/utils.js"></script>
+    <script src="js/checklist.js"></script>
+  </body>
+</html>

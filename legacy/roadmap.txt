@@ -1,0 +1,137 @@
+Roadmap versi awal
+📌 Roadmap Pengembangan Aplikasi Kunjungan (Fase B – Fase F)
+
+Fase B — Offline / UX / flow status (sedang dikerjakan setelah A)
+Tujuan: fitur Belum Terkirim & Arsip, indikator checklist, collapse otomatis, validasi.
+  B1. Simpan lokal dulu (localStorage pendingKunjungan[]) jika server down → tampil di tab Belum Terkirim.
+  B2. Tombol sinkronisasi: ambil pendingKunjungan POST satu-per-satu; jika sukses hapus dari pending dan pindah ke Arsip UI.
+  B3. Visual: setiap section (Kondisi, Visual, Temuan) punya icon status hijau ketika semua field wajib terisi; auto-collapse section saat pindah.
+  B4. Validasi sebelum simpan: minimal 1 foto mesin, semua kondisi wajib terisi, dsb.
+Files: app.js, checklist.js, UI CSS/HTML.
+Acceptance criteria
+  - Server unreachable → data tetap aman di localStorage dan dapat dikirim manual.
+  - UX: ikon checklist hijau muncul bila lengkap.
+
+Fase C — Konsolidasi data & jadwal
+Tujuan: pastikan format tanggal konsisten (dd-mm-yyyy seperti permintaanmu), dan format kode_jadwal sesuai ketentuan baru (6 digit akhir kode_user + yy + mm + dd + 2 digit urut), serta jadwal hanya untuk peran: Petugas.
+  - Buat skrip Node/JS kecil untuk migrasi db.json jadwal: baca jadwal, hitung 6digit akhir kode_user (substr), format tanggal yymmdd, tambahkan urut berdasarkan user+tanggal.
+  - Validasi: hanya tambahkan jadwal untuk users dengan peran === "Petugas".
+Acceptance criteria
+  - Semua tanggal di db.json uniform dd-mm-yyyy.
+  - Semua kode_jadwal konsisten sesuai pola baru.
+
+Fase D — Backend lengkap (Laravel + SQLite)
+Tujuan: migrasi dari json-server ke backend nyata.
+High level
+  - Laravel setup (sanctum untuk API auth).
+  - Table: users, lokasi (locations), jadwal (schedules), kunjungan (visits), detail_kunjungan (visit_details), berita.
+  - File upload endpoint (multipart), simpan di storage/app/public/uploads, jalankan php artisan storage:link.
+  - API endpoints (examples):
+    - POST /api/login → token
+    - GET /api/jadwal?kode_user=...&tanggal=...
+    - POST /api/kunjungan (terima id = kode_kunjungan)
+    - POST /api/detail
+    - POST /api/upload (file upload returns path)
+    - GET /api/kunjungan/{id}
+    - GET /api/detail?kunjunganId=...
+Migration schema (singkat)
+  - users (id PK, kode_user varchar uniq, nama, password_hash, peran, cabang)
+  - lokasi (kode_lokasi PK, nama, id_mesin, alamat, cabang)
+  - jadwal (kode_jadwal PK, tanggal DATE, kode_user FK, kode_lokasi FK, tipe, periode_awal, periode_akhir)
+  - kunjungan (id PK = kode_kunjungan, tanggal DATE, kode_user FK, nama_user, cabang, kode_lokasi FK, nama_lokasi, id_mesin, jenis_kunjungan, terjadwal, waktu_mulai, waktu_selesai, durasi, status)
+  - detail_kunjungan (id PK, kunjungan_id FK, json_data TEXT) — atau simpan kolom terstruktur (lebih mudah query).
+Acceptance criteria
+  - Semua endpoint siap, authentikasi bekerja, file uploads tersimpan.
+
+Fase E — Integrasi frontend <-> backend
+  - Ganti base URL http://localhost:3000 ke API_URL.
+  - Tambah header Authorization Bearer token.
+  - Implement upload foto via fetch('/api/upload', formData) dan simpan returned path di detail object sebelum POST /api/detail.
+Acceptance criteria
+  - Upload foto sukses & path disimpan, kunjungan + detail bisa diambil kembali.
+
+Fase F — Deploy & CI
+  - Pilih hosting (VPS / PaaS). Pastikan dukungan PHP >= versi Laravel, composer, ext required.
+  - Setup env, storage:link, scheduling, worker (jika perlu).
+  - Pipeline: GitHub Actions untuk composer install, php artisan migrate --force, php artisan config:cache, upload artifacts.
+  - Backup DB SQLite / routine export.
+Acceptance criteria
+  - Aplikasi tersedia di domain, SSL, file upload bekerja, serta API responsif.
+
+Backlog / Enhancement (boleh dikerjakan kemudian)
+  - Notifikasi push / status lokasi realtime.
+  - Admin panel untuk buat berita / jadwal.
+  - Analytics & export laporan (CSV/PDF).
+  - Role-based access & audit trail.
+
+Roadmap versi baru per 03/10/2025
+📌 Roadmap Pengembangan Aplikasi Kunjungan (Fase B – Fase F)
+
+Fase B – Sinkronisasi & Offline Mode
+1. Local Storage / IndexedDB
+  - Simpan kunjungan (dan temuan) ke storage lokal jika tidak ada koneksi internet.
+  - Pisahkan data ke tab:
+    - Kunjungan (Terjadwal)
+    - Belum Terkirim (Offline)
+    - Arsip (Sudah Terkirim ke server)
+2. Sync Engine
+  - Buat fungsi sinkronisasi manual (tombol "Sync").
+  - Deteksi koneksi internet: jika online → kirim data Belum Terkirim ke server, lalu pindahkan ke Arsip.
+  - Jika gagal → data tetap di Belum Terkirim.
+3. Feedback UI
+  - Indikator status sinkronisasi.
+  - Badge jumlah data di setiap tab.
+
+Fase C – Backend API (Laravel + SQLite)
+1. Setup Backend
+  - Framework: Laravel 12 + SQLite (untuk deploy ringan).
+  - Buat migrasi tabel: users, lokasi, jadwal, kunjungan, temuan.
+  - Tentukan PK & FK sesuai desain fase A.
+2. REST API
+  - Endpoint login (/login) → autentikasi user.
+  - Endpoint GET /jadwal?kode_user=xxx&tanggal=dd-mm-yyyy → ambil jadwal per user.
+  - Endpoint POST /kunjungan → simpan kunjungan + detail.
+  - Endpoint POST /temuan → simpan temuan per baris.
+  - Endpoint GET /kunjungan → laporan kunjungan.
+  - Endpoint GET /temuan → laporan temuan.
+3. Middleware
+  - Autentikasi token JWT.
+  - Role-based access (admin vs petugas).
+
+Fase D – Integrasi Frontend & Backend
+1. Ganti JSON-Server dengan Laravel API
+  - Update fetch("http://localhost:3000/...") → ke Laravel API.
+  - Implementasi token login (simpan token di localStorage).
+2. Sinkronisasi ke Backend
+  - Jika offline → tetap ke local storage.
+  - Jika online → POST langsung ke Laravel API.
+  - Data Belum Terkirim disinkronkan ke server saat online.
+3. Pengelolaan Jadwal & Lokasi
+  - Jadwal & lokasi hanya bisa diinput via admin (backend).
+  - Petugas hanya bisa lihat & isi checklist.
+
+Fase E – Reporting & Dashboard
+1. Laporan Ringkas
+  - Target vs capaian kunjungan.
+  - Durasi kunjungan (filter: <15 menit, 15–30 menit, >30 menit).
+2. Laporan Kondisi & Visual
+  - Ekspor detail kondisi & visual.
+  - Tampilkan foto kunjungan.
+3. Laporan Temuan
+  - Rekap temuan per kategori.
+  - Export Excel / PDF untuk analisis masalah.
+4. Dashboard Admin (Web)
+  - Grafik capaian kunjungan per cabang.
+  - Heatmap masalah berdasarkan temuan.
+
+Fase F – Deployment & Maintenance
+1. Deployment
+  - Hosting Laravel di VPS / shared hosting.
+  - Database SQLite atau MySQL (jika multi-user skala besar).
+  - Deploy frontend (PWA) agar bisa dipasang di HP.
+2. PWA (Progressive Web App)
+  - Installable app di Android (tanpa Play Store).
+  - Offline-first support.
+3. Monitoring & Logging
+  - Tambahkan error logging.
+  - Backup otomatis database.
