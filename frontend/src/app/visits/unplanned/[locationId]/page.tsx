@@ -12,45 +12,65 @@ import {
 } from "lucide-react";
 import api from "@/lib/api";
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
+
+import { Location, VisitType } from "@/types";
 
 export default function UnplannedVisitTypePage() {
   const params = useParams();
   const router = useRouter();
-  const [location, setLocation] = useState<any>(null);
-  const [visitTypes, setVisitTypes] = useState<any[]>([]);
+  const [location, setLocation] = useState<Location | null>(null);
+  const [visitTypes, setVisitTypes] = useState<VisitType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      // 1. Fetch Location info (We use the schedules endpoint or similar, but for now we look for location in list)
-      // Since we don't have a specific locations/{id} yet, we fetch all and find
       const locResponse = await api.get('/locations');
-      const loc = locResponse.data.find((l: any) => l.id == params.locationId);
+      const loc = locResponse.data.find((l: { id: number | string }) => String(l.id) === params.locationId);
       setLocation(loc);
 
-      // 2. Fetch Visit Types
       const vtResponse = await api.get('/visit-types');
       setVisitTypes(vtResponse.data);
     } catch (err) {
       console.error("Error fetching data:", err);
-      setError("Gagal memuat tipe kunjungan.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (isLoading) {
+  const handleRequestVisit = async (typeId: number, typeName: string) => {
+    if (!confirm(`Kirim permintaan persetujuan untuk kunjungan ${typeName}?`)) return;
+    
+    setIsSubmitting(true);
+    try {
+      await api.post('/visit-requests', {
+        location_id: params.locationId,
+        visit_type_id: typeId,
+        notes: `Permintaan kunjungan tak terjadwal ke ${location?.lokasi || 'Lokasi'}`
+      });
+      alert("Permintaan kunjungan telah dikirim. Menunggu persetujuan admin.");
+      router.push('/');
+    } catch (err) {
+      console.error("Error creating visit request:", err);
+      alert("Gagal mengirim permintaan.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (isLoading || isSubmitting) {
     return (
-      <div className="flex flex-col items-center justify-center pt-20 space-y-4">
+      <div className="flex flex-col items-center justify-center pt-40 space-y-4">
         <Loader2 className="w-10 h-10 animate-spin text-secondary" />
-        <p className="text-accent text-sm font-medium animate-pulse">Menyiapkan Tipe Kunjungan...</p>
+        <p className="text-accent text-sm font-medium animate-pulse">
+          {isSubmitting ? "Mengirim Permintaan..." : "Menyiapkan Tipe Kunjungan..."}
+        </p>
       </div>
     );
   }
@@ -87,7 +107,7 @@ export default function UnplannedVisitTypePage() {
 
       {/* Header Info */}
       <section className="space-y-4">
-        <div className="glass-dark p-6 rounded-[2rem] border border-white/5 space-y-2">
+        <div className="maroon-gradient p-6 rounded-[2rem] shadow-lg border border-white/10 space-y-2">
           <div className="flex items-center gap-2 text-secondary text-[10px] font-black uppercase tracking-widest">
             <MapPin className="w-4 h-4" />
             <span>Lokasi Dipilih</span>
@@ -101,7 +121,7 @@ export default function UnplannedVisitTypePage() {
         <div className="px-2">
           <h3 className="text-sm font-bold uppercase tracking-wider text-white/70 flex items-center gap-2">
             <ClipboardList className="w-4 h-4 text-secondary" />
-            Pilih Tipe Kunjungan
+            Minta Persetujuan Kunjungan
           </h3>
         </div>
       </section>
@@ -113,17 +133,17 @@ export default function UnplannedVisitTypePage() {
             key={type.id}
             variants={item}
             whileTap={{ scale: 0.98 }}
-            onClick={() => router.push(`/visits/create?location_id=${params.locationId}&visit_type_id=${type.id}`)}
-            className="glass-dark p-1 rounded-3xl border border-white/5 hover:border-secondary/20 transition-all group overflow-hidden"
+            onClick={() => handleRequestVisit(type.id, type.nama_tipe)}
+            className="maroon-gradient shadow-lg p-1 rounded-3xl border border-white/10 hover:border-secondary/30 transition-all group overflow-hidden"
           >
-            <div className="p-4 flex items-center justify-between">
+            <div className="p-4 flex items-center justify-between cursor-pointer">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:bg-secondary/10 transition-colors">
                   <CheckCircle2 className="w-5 h-5 text-accent group-hover:text-secondary" />
                 </div>
                 <div className="space-y-0.5">
                   <h4 className="font-bold text-sm text-white uppercase tracking-tight">{type.nama_tipe}</h4>
-                  <p className="text-[10px] text-accent font-medium">Buka form laporan untuk {type.nama_tipe}</p>
+                  <p className="text-[10px] text-accent font-medium">Klik untuk minta izin kunjungan {type.nama_tipe}</p>
                 </div>
               </div>
               <ChevronRight className="w-5 h-5 text-white/20 group-hover:text-secondary" />

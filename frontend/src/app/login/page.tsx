@@ -4,13 +4,14 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { User, Lock, AlertCircle, Loader2, LogIn } from 'lucide-react';
+import { User, Lock, Eye, EyeOff, AlertCircle, Loader2, LogIn } from 'lucide-react';
 import api from '@/lib/api';
 import { cn } from '@/lib/utils';
 
 export default function LoginPage() {
   const [kodeUser, setKodeUser] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -34,8 +35,13 @@ export default function LoginPage() {
 
       // Redirect to dashboard
       router.push('/');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Login gagal. Cek kembali Kode User dan Password.');
+    } catch (err: unknown) {
+      if (typeof err === 'object' && err !== null && 'response' in err) {
+        const errorData = (err as { response: { data: { message?: string } } }).response.data;
+        setError(errorData.message || 'Login gagal. Cek kembali Kode User dan Password.');
+      } else {
+        setError('Terjadi kesalahan pada server. Silakan coba lagi nanti.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -44,8 +50,8 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-[var(--background)] overflow-hidden relative">
       {/* Background Ornaments */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] maroon-gradient rounded-full blur-[120px] opacity-20" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary rounded-full blur-[120px] opacity-10" />
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-white/5 rounded-full blur-[120px] opacity-20 dark:opacity-5" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-white/5 rounded-full blur-[120px] opacity-10 dark:opacity-5" />
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
@@ -54,20 +60,20 @@ export default function LoginPage() {
         className="w-full max-w-md z-10"
       >
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl glass-dark mb-4 shadow-xl border border-white/10 overflow-hidden bg-white/5">
+          <div className="inline-flex items-center justify-center w-48 h-20 rounded-2xl mb-4 overflow-hidden px-4">
             <Image 
               src="/assets/logo-rak.png" 
               alt="Logo RAK" 
-              width={64} 
-              height={64} 
+              width={160} 
+              height={50} 
               className="object-contain"
             />
           </div>
-          <h1 className="text-3xl font-bold gold-text tracking-tight uppercase">RAKSI</h1>
+          <h1 className="text-3xl font-bold tracking-tight uppercase maroon-gradient-text dark:gold-text">RAKSI</h1>
           <p className="text-accent text-sm mt-1">Sistem Kunjungan Petugas Lapangan</p>
         </div>
 
-        <div className="glass-dark p-8 rounded-3xl shadow-2xl space-y-6 border border-white/10">
+        <div className="glass-dark p-8 rounded-3xl space-y-6 border border-white/10">
           <form onSubmit={handleLogin} className="space-y-5">
             {error && (
               <motion.div 
@@ -87,9 +93,9 @@ export default function LoginPage() {
                 <input
                   type="text"
                   value={kodeUser}
-                  onChange={(e) => setKodeUser(e.target.value)}
-                  placeholder="Masukkan Kode User"
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-secondary/50 focus:ring-4 focus:ring-secondary/5 transition-all placeholder:text-white/20"
+                  onChange={(e) => setKodeUser(e.target.value.toUpperCase())}
+                  placeholder="MASUKKAN KODE USER"
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-secondary/50 focus:ring-4 focus:ring-secondary/5 transition-all placeholder:text-white/20 uppercase"
                   required
                 />
               </div>
@@ -100,24 +106,32 @@ export default function LoginPage() {
               <div className="relative group">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-accent group-focus-within:text-secondary transition-colors" />
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-secondary/50 focus:ring-4 focus:ring-secondary/5 transition-all placeholder:text-white/20"
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-12 text-white focus:outline-none focus:border-secondary/50 focus:ring-4 focus:ring-secondary/5 transition-all placeholder:text-white/20"
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-accent hover:text-secondary transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className={cn(
-                "w-full maroon-gradient py-4 rounded-2xl text-white font-bold shadow-lg flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all border border-white/10",
-                isLoading && "opacity-70 cursor-not-allowed"
-              )}
-            >
+            <div className="pt-4">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className={cn(
+                  "w-full maroon-gradient py-4 rounded-2xl text-white font-bold shadow-lg flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all border border-white/10",
+                  isLoading && "opacity-70 cursor-not-allowed"
+                )}
+              >
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
@@ -127,7 +141,8 @@ export default function LoginPage() {
                 </>
               )}
             </button>
-          </form>
+          </div>
+        </form>
           
           <div className="text-center pt-2">
             <p className="text-white/30 text-[10px] uppercase tracking-[0.2em]">Developed by PT. Royal Ananta Kirtya</p>

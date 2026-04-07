@@ -156,7 +156,7 @@ export default function ScheduleDetailPage() {
         </section>
 
         {/* Location Card */}
-        <div className="glass-dark rounded-[2.5rem] p-6 border border-white/5 space-y-6 shadow-2xl">
+        <div className="maroon-gradient rounded-[2.5rem] p-6 border border-white/10 space-y-6 shadow-2xl">
           <div className="space-y-4">
             <div className="flex gap-4">
               <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center flex-shrink-0">

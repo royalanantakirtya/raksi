@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { 
   Loader2, 
   Search, 
-  MapPin, 
   ChevronRight,
   AlertCircle,
   Building2,
@@ -13,11 +12,11 @@ import {
 } from "lucide-react";
 import api from "@/lib/api";
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
+import { Location } from "@/types";
 
 export default function LocationsPage() {
   const router = useRouter();
-  const [locations, setLocations] = useState<any[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -76,23 +75,23 @@ export default function LocationsPage() {
     >
       {/* Header Info */}
       <section className="space-y-1">
-        <motion.h2 variants={item} className="text-2xl font-bold tracking-tight">
-          Cari <span className="gold-text uppercase">Lokasi</span>
+        <motion.h2 variants={item} className="text-slate-800 dark:text-white text-2xl font-bold tracking-tight">
+          Cari <span className="text-primary dark:gold-text uppercase">Lokasi</span>
         </motion.h2>
-        <motion.p variants={item} className="text-accent text-xs font-medium">
+        <motion.p variants={item} className="text-slate-500 dark:text-accent text-xs font-medium">
           Pilih lokasi untuk memulai kunjungan tak terjadwal
         </motion.p>
       </section>
 
       {/* Search Bar */}
       <motion.div variants={item} className="relative group">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-accent group-focus-within:text-secondary transition-colors" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-accent group-focus-within:text-secondary transition-colors" />
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Cari ATM atau Kantor..."
-          className="w-full bg-white/5 border border-white/5 rounded-2xl py-3.5 pl-11 pr-4 text-sm text-white focus:outline-none focus:border-secondary/30 focus:shadow-[0_0_15px_rgba(214,181,117,0.1)] transition-all placeholder:text-white/20"
+          className="w-full bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/5 rounded-2xl py-3.5 pl-11 pr-4 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-secondary/30 focus:shadow-[0_0_15px_rgba(214,181,117,0.1)] transition-all placeholder:text-gray-500 dark:placeholder:text-white/20"
         />
       </motion.div>
 
@@ -106,7 +105,7 @@ export default function LocationsPage() {
         )}
 
         {filteredLocations.length === 0 ? (
-          <div className="text-center py-20 glass-dark rounded-[2rem] border border-white/5">
+          <div className="text-center py-20 maroon-gradient rounded-[2rem] border border-white/10 shadow-lg">
             <Building2 className="w-12 h-12 text-accent/20 mx-auto mb-3" />
             <p className="text-accent/60 text-sm">Tidak ada lokasi yang ditemukan</p>
           </div>
@@ -117,7 +116,7 @@ export default function LocationsPage() {
               variants={item}
               whileTap={{ scale: 0.98 }}
               onClick={() => router.push(`/visits/unplanned/${location.id}`)}
-              className="glass-dark p-1 rounded-3xl border border-white/5 hover:border-secondary/20 transition-all group overflow-hidden"
+              className="maroon-gradient shadow-lg p-1 rounded-3xl border border-white/10 hover:border-secondary/30 transition-all group overflow-hidden"
             >
               <div className="p-4 flex items-start gap-4">
                 <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center flex-shrink-0 group-hover:bg-secondary/10 transition-colors">

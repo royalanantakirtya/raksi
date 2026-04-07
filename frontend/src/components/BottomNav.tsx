@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Calendar, MapPin, User, MoreHorizontal } from 'lucide-react';
+import { Home, Calendar, MapPin, MoreHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -20,7 +20,7 @@ export default function BottomNav() {
   if (pathname === '/login') return null;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 glass-dark border-t border-white/10 px-2 py-1.5 pb-safe shadow-2xl flex justify-around items-center h-16">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-primary border-t border-white/10 px-2 py-1.5 pb-safe shadow-2xl flex justify-around items-center h-16">
       {navItems.map((item) => {
         const isActive = pathname === item.href;
         const Icon = item.icon;

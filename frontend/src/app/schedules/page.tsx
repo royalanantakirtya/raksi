@@ -15,10 +15,11 @@ import {
 import api from "@/lib/api";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { Schedule } from "@/types";
 
 export default function SchedulesPage() {
   const router = useRouter();
-  const [schedules, setSchedules] = useState<any[]>([]);
+  const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -77,26 +78,26 @@ export default function SchedulesPage() {
     >
       {/* Header Info */}
       <section className="space-y-1">
-        <motion.h2 variants={item} className="text-2xl font-bold tracking-tight">
-          Jadwal <span className="gold-text uppercase">Kunjungan</span>
+        <motion.h2 variants={item} className="text-slate-800 dark:text-white text-2xl font-bold tracking-tight">
+          Jadwal <span className="text-primary dark:gold-text uppercase">Kunjungan</span>
         </motion.h2>
-        <motion.p variants={item} className="text-accent text-xs font-medium">
+        <motion.p variants={item} className="text-slate-500 dark:text-accent text-xs font-medium">
           Daftar lokasi yang harus dikunjungi hari ini
         </motion.p>
       </section>
 
       {/* Search Bar */}
       <motion.div variants={item} className="relative group">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-accent group-focus-within:text-secondary transition-colors" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-accent group-focus-within:text-secondary transition-colors" />
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Cari lokasi atau alamat..."
-          className="w-full bg-white/5 border border-white/5 rounded-2xl py-3.5 pl-11 pr-4 text-sm text-white focus:outline-none focus:border-secondary/30 focus:shadow-[0_0_15px_rgba(214,181,117,0.1)] transition-all placeholder:text-white/20"
+          className="w-full bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/5 rounded-2xl py-3.5 pl-11 pr-4 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-secondary/30 focus:shadow-[0_0_15px_rgba(214,181,117,0.1)] transition-all placeholder:text-gray-500 dark:placeholder:text-white/20"
         />
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 bg-white/5 rounded-lg border border-white/5 cursor-pointer hover:bg-white/10 transition-colors">
-          <Filter className="w-3.5 h-3.5 text-accent" />
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 bg-gray-200 dark:bg-white/5 rounded-lg border border-gray-300 dark:border-white/5 cursor-pointer hover:bg-gray-300 dark:hover:bg-white/10 transition-colors">
+          <Filter className="w-3.5 h-3.5 text-gray-600 dark:text-accent" />
         </div>
       </motion.div>
 
@@ -110,7 +111,7 @@ export default function SchedulesPage() {
         )}
 
         {filteredSchedules.length === 0 ? (
-          <div className="text-center py-20 glass-dark rounded-[2rem] border border-white/5">
+          <div className="text-center py-20 maroon-gradient rounded-[2rem] border border-white/10 shadow-lg">
             <Calendar className="w-12 h-12 text-accent/20 mx-auto mb-3" />
             <p className="text-accent/60 text-sm">Tidak ada jadwal yang ditemukan</p>
           </div>
@@ -121,7 +122,7 @@ export default function SchedulesPage() {
               variants={item}
               whileTap={{ scale: 0.98 }}
               onClick={() => router.push(`/schedules/${schedule.id}`)}
-              className="glass-dark p-1 rounded-3xl border border-white/5 hover:border-secondary/20 transition-all group overflow-hidden"
+              className="maroon-gradient shadow-lg p-1 rounded-3xl border border-white/10 hover:border-secondary/30 transition-all group overflow-hidden"
             >
               <div className="p-4 flex items-start gap-4">
                 <div className="w-12 h-12 rounded-2xl maroon-gradient flex items-center justify-center flex-shrink-0 shadow-lg border border-white/10">
@@ -134,7 +135,7 @@ export default function SchedulesPage() {
                       {schedule.location.lokasi}
                     </h3>
                     <span className="text-[9px] font-black bg-secondary/20 text-secondary px-2 py-0.5 rounded-full uppercase tracking-tighter">
-                      {schedule.visit_type.nama_tipe}
+                      {schedule.visit_type?.nama_tipe || "Tipe Kunjungan"}
                     </span>
                   </div>
                   

@@ -28,20 +28,16 @@ export default function Header() {
   if (pathname === '/login') return null;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 maroon-gradient text-white px-4 py-3 shadow-lg flex justify-between items-center h-16">
+    <header className="fixed top-0 left-0 right-0 z-40 bg-primary text-white px-4 py-3 shadow-lg flex justify-between items-center h-16">
       <div className="flex items-center gap-3">
-        <div className="bg-white/10 p-1.5 rounded-xl border border-white/10">
+        <div className="bg-white p-1 rounded-sm w-24 h-10 flex items-center justify-center">
           <Image 
             src="/assets/logo-rak.png" 
             alt="Logo RAK" 
-            width={32} 
-            height={32} 
-            className="object-contain filter brightness-0 invert"
+            width={80} 
+            height={24} 
+            className="object-contain"
           />
-        </div>
-        <div className="flex flex-col">
-          <h1 className="text-sm font-bold tracking-tight gold-text">RAKSI</h1>
-          <p className="text-[10px] text-accent uppercase tracking-widest hidden sm:block">Royal Ananta Kirtya</p>
         </div>
       </div>
 
@@ -51,9 +47,13 @@ export default function Header() {
           <p className="text-xs font-semibold">{userName}</p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center border border-white/10">
-            <UserIcon className="w-4 h-4 text-secondary" />
-          </div>
+          <button 
+            onClick={() => router.push('/more')}
+            className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center border border-white/10 hover:bg-white/20 transition-all active:scale-90"
+            title="Profil & Lainnya"
+          >
+            <UserIcon className="w-5 h-5 text-secondary" />
+          </button>
           <button 
             onClick={handleLogout}
             className="p-2 rounded-xl hover:bg-white/10 transition-colors text-white/70 hover:text-white"

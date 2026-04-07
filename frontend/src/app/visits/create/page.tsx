@@ -9,11 +9,13 @@ import {
   AlertCircle, 
   CheckCircle2,
   ListChecks,
-  Info
+  Info,
+  ChevronRight
 } from "lucide-react";
 import api from "@/lib/api";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { Schedule, VisitType, ChecklistTemplate } from "@/types";
 
 function VisitFormContent() {
   const router = useRouter();
@@ -22,8 +24,8 @@ function VisitFormContent() {
   const locationId = searchParams.get("location_id");
   const visitTypeId = searchParams.get("visit_type_id");
 
-  const [schedule, setSchedule] = useState<any>(null);
-  const [template, setTemplate] = useState<any>(null);
+  const [schedule, setSchedule] = useState<Partial<Schedule> | null>(null);
+  const [template, setTemplate] = useState<VisitType | null>(null);
   const [responses, setResponses] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,48 +37,51 @@ function VisitFormContent() {
       router.push("/schedules");
       return;
     }
-    fetchData();
-  }, [scheduleId, locationId, visitTypeId]);
 
-  const fetchData = async () => {
-    setIsLoading(true);
-    try {
-      let vtId = visitTypeId;
-      
-      if (scheduleId) {
-        // 1a. Get Schedule details (Scheduled Visit)
-        const schResponse = await api.get(`/schedules/${scheduleId}`);
-        setSchedule(schResponse.data);
-        vtId = schResponse.data.visit_type_id;
-      } else {
-        // 1b. Get Location details (Unplanned Visit)
-        const locResponse = await api.get(`/locations`);
-        const loc = locResponse.data.find((l: any) => l.id == locationId);
-        setSchedule({ location: loc, location_id: locationId });
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        let vtId = visitTypeId;
+        
+        if (scheduleId) {
+          // 1a. Get Schedule details (Scheduled Visit)
+          const schResponse = await api.get(`/schedules/${scheduleId}`);
+          const scheduleData: Schedule = schResponse.data;
+          setSchedule(scheduleData);
+          vtId = String(scheduleData.visit_type_id);
+        } else {
+          // 1b. Get Location details (Unplanned Visit)
+          const locResponse = await api.get(`/locations`);
+          const loc = locResponse.data.find((l: { id: number | string }) => String(l.id) === locationId);
+          setSchedule({ location: loc, location_id: Number(locationId) });
+        }
+
+        // 2. Get VisitType templates
+        const vtResponse = await api.get(`/visit-types/${vtId}`);
+        const templateData: VisitType = vtResponse.data;
+        setTemplate(templateData);
+
+        // Initialize responses state
+        const initialResponses: Record<string, string> = {};
+        templateData.checklist_templates?.forEach((t) => {
+          initialResponses[t.id] = "";
+        });
+        setResponses(initialResponses);
+      } catch (err) {
+        console.error("Error fetching visit data:", err);
+        setError("Gagal memuat template laporan.");
+      } finally {
+        setIsLoading(false);
       }
+    };
 
-      // 2. Get VisitType templates
-      const vtResponse = await api.get(`/visit-types/${vtId}`);
-      setTemplate(vtResponse.data);
+    fetchData();
+  }, [scheduleId, locationId, visitTypeId, router]);
 
-      // Initialize responses state
-      const initialResponses: Record<string, string> = {};
-      vtResponse.data.checklist_templates.forEach((t: any) => {
-        initialResponses[t.id] = "";
-      });
-      setResponses(initialResponses);
-    } catch (err) {
-      console.error("Error fetching visit data:", err);
-      setError("Gagal memuat template laporan.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleInputChange = (templateId: string, value: string) => {
-    setResponses(prev => ({
+  const handleInputChange = (templateId: string | number, value: string) => {
+    setResponses((prev) => ({
       ...prev,
-      [templateId]: value
+      [String(templateId)]: value
     }));
   };
 
@@ -94,8 +99,8 @@ function VisitFormContent() {
       const payload = {
         kode_kunjungan: `KUNJ-${scheduleId || locationId}-${Date.now()}`,
         tanggal: new Date().toISOString().split('T')[0],
-        location_id: schedule.location_id,
-        visit_type_id: template.id,
+        location_id: schedule?.location_id || 0,
+        visit_type_id: template?.id || 0,
         schedule_id: scheduleId || null,
         terjadwal: scheduleId ? 'terjadwal' : 'tidak terjadwal',
         waktu_mulai: new Date().toLocaleTimeString('id-id', { hour12: false }),
@@ -152,7 +157,7 @@ function VisitFormContent() {
             <ListChecks className="w-4 h-4 text-secondary" />
             <span>Pengisian Laporan</span>
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-white uppercase">{schedule.location.lokasi}</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-white uppercase">{schedule.location?.lokasi || "Lokasi"}</h2>
           <div className="flex items-center gap-2 text-white/40 text-[10px] font-bold uppercase tracking-wider">
             <Info className="w-3 h-3" />
             <span>Target: {template.nama_tipe}</span>
@@ -184,13 +189,13 @@ function VisitFormContent() {
         {/* Dynamic Form */}
         {!success && (
           <form onSubmit={handleSubmit} className="space-y-4">
-            {template.checklist_templates.map((field: any, idx: number) => (
+            {template.checklist_templates?.map((field: ChecklistTemplate, idx: number) => (
               <motion.div 
                 key={field.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
-                className="glass-dark p-6 rounded-[2rem] border border-white/5 space-y-4 shadow-xl"
+                className="maroon-gradient p-6 rounded-[2rem] border border-white/10 space-y-4 shadow-xl"
               >
                 <div className="space-y-1">
                   <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-1">Parameter {idx + 1}</p>
@@ -209,28 +214,68 @@ function VisitFormContent() {
                   />
                 )}
 
-                {/* Radio Type */}
-                {field.field_type === 'radio' && (
-                  <div className="grid grid-cols-2 gap-3">
-                    {['YA', 'TIDAK'].map((option) => (
-                      <button
-                        key={option}
-                        type="button"
-                        onClick={() => handleInputChange(field.id, option)}
-                        className={cn(
-                          "py-3 rounded-2xl text-[10px] uppercase font-black tracking-widest border transition-all active:scale-95",
-                          responses[field.id] === option 
-                            ? "maroon-gradient text-white border-white/20 shadow-lg" 
-                            : "bg-white/5 text-white/30 border-white/5"
-                        )}
-                      >
-                        {option}
-                      </button>
-                    ))}
+                {/* Number Type */}
+                {field.field_type === 'number' && (
+                  <input
+                    type="number"
+                    required
+                    value={responses[field.id] || ""}
+                    onChange={(e) => handleInputChange(field.id, e.target.value)}
+                    placeholder="0"
+                    className="w-full bg-white/5 border border-white/5 rounded-2xl py-3.5 px-5 text-sm text-white focus:outline-none focus:border-secondary/30 transition-all placeholder:text-white/20"
+                  />
+                )}
+
+                {/* Select Type with dynamic options */}
+                {field.field_type === 'select' && field.options && (
+                  <div className="relative">
+                    <select
+                      value={responses[field.id] || ""}
+                      onChange={(e) => handleInputChange(field.id, e.target.value)}
+                      required
+                      className="w-full bg-white/5 border border-white/5 rounded-2xl py-3.5 px-5 text-sm text-white focus:outline-none focus:border-secondary/30 transition-all appearance-none"
+                    >
+                      <option value="" className="bg-surface text-white">-- Pilih Status --</option>
+                      {field.options.map((opt: string) => (
+                        <option key={opt} value={opt} className="bg-surface text-white">{opt}</option>
+                      ))}
+                    </select>
+                    <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 rotate-90" />
                   </div>
                 )}
 
-                {/* Choice / Select Type */}
+                {/* File / Camera Type */}
+                {field.field_type === 'file' && (
+                  <div className="space-y-3">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      capture="environment"
+                      onChange={(e) => handleInputChange(field.id, e.target.files?.[0]?.name || "")}
+                      className="hidden"
+                      id={`file-${field.id}`}
+                    />
+                    <label 
+                      htmlFor={`file-${field.id}`}
+                      className="flex items-center gap-3 p-4 rounded-2xl bg-white/5 border border-dashed border-white/20 text-accent hover:border-secondary/50 hover:bg-white/10 transition-all cursor-pointer active:scale-[0.98]"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
+                        <Save className="w-5 h-5 text-secondary" />
+                      </div>
+                      <span className="text-xs font-bold uppercase tracking-wider">
+                        {responses[field.id] ? "Ganti Foto" : "Ambil Foto Sekarang"}
+                      </span>
+                    </label>
+                    {responses[field.id] && (
+                      <div className="flex items-center gap-2 px-2">
+                        <CheckCircle2 className="w-4 h-4 text-success" />
+                        <p className="text-[10px] text-white/50 font-medium truncate">{responses[field.id]}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Legacy Choice / Select Type (for backward compatibility) */}
                 {field.field_type === 'choice' && (
                   <select
                     value={responses[field.id] || ""}
