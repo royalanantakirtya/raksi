@@ -116,11 +116,11 @@ export default function Home() {
     >
       {/* Welcome Section */}
       <section className="space-y-1">
-        <motion.p variants={item} className="text-slate-500 dark:gold-text font-bold text-xs uppercase tracking-widest">
+        <motion.p variants={item} className="text-zinc-500 dark:gold-text font-bold text-xs uppercase tracking-widest">
           {new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
         </motion.p>
-        <motion.h2 variants={item} className="text-slate-800 dark:text-white text-2xl font-bold tracking-tight">
-          Selamat Datang, <span className="text-primary dark:gold-text uppercase">{user?.nama_user?.split(' ')[0]}</span>
+        <motion.h2 variants={item} className="text-zinc-800 dark:text-white text-2xl font-bold tracking-tight">
+          Selamat Datang, <span className="gold-text-dark dark:gold-text uppercase">{user?.nama_user?.split(' ')[0]}</span>
         </motion.h2>
       </section>
 

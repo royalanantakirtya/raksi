@@ -75,10 +75,10 @@ export default function LocationsPage() {
     >
       {/* Header Info */}
       <section className="space-y-1">
-        <motion.h2 variants={item} className="text-slate-800 dark:text-white text-2xl font-bold tracking-tight">
-          Cari <span className="text-primary dark:gold-text uppercase">Lokasi</span>
+        <motion.h2 variants={item} className="text-zinc-800 dark:text-white text-2xl font-bold tracking-tight">
+          Cari <span className="gold-text-dark dark:gold-text uppercase">Lokasi</span>
         </motion.h2>
-        <motion.p variants={item} className="text-slate-500 dark:text-accent text-xs font-medium">
+        <motion.p variants={item} className="text-zinc-500 dark:text-accent text-xs font-medium">
           Pilih lokasi untuk memulai kunjungan tak terjadwal
         </motion.p>
       </section>

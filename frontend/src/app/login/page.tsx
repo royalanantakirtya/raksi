@@ -69,7 +69,7 @@ export default function LoginPage() {
               className="object-contain"
             />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight uppercase maroon-gradient-text dark:gold-text">RAKSI</h1>
+          <h1 className="gold-text-dark dark:gold-text text-3xl font-bold tracking-tight uppercase">RAKSI</h1>
           <p className="text-accent text-sm mt-1">Sistem Kunjungan Petugas Lapangan</p>
         </div>
 
