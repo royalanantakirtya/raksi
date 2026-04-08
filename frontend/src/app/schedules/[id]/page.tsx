@@ -105,7 +105,8 @@ export default function ScheduleDetailPage() {
   };
 
   const startVisit = () => {
-    if (!distance || distance > GEOFENCE_RADIUS) {
+    const isDev = process.env.NODE_ENV === 'development';
+    if (!isDev && (!distance || distance > GEOFENCE_RADIUS)) {
       if (!confirm("Anda berada di luar radius lokasi (250m). Lanjutkan tetap mengisi laporan?")) {
         return;
       }
@@ -124,7 +125,7 @@ export default function ScheduleDetailPage() {
 
   if (!schedule) return null;
 
-  const isWithinRadius = distance !== null && distance <= GEOFENCE_RADIUS;
+  const isWithinRadius = process.env.NODE_ENV === 'development' || (distance !== null && distance <= GEOFENCE_RADIUS);
 
   return (
     <div className="space-y-6 pb-12">

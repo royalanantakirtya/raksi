@@ -20,6 +20,9 @@ class ChecklistTemplateSeeder extends Seeder
             ]);
         }
 
+        // Menghapus data usang / duplikat sebelum seeding ulang
+        \App\Models\ChecklistTemplate::query()->delete();
+
         foreach ($visitTypes as $type) {
             $fields = [
                 ['field_name' => 'lcd_monitor', 'label' => 'Kondisi LCD Monitor', 'field_type' => 'select', 'options' => ['Baik', 'Mati Total', 'Tertempel Tulisan']],

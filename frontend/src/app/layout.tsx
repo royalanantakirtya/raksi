@@ -15,6 +15,20 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "RAKSI - Royal Ananta Kirtya Field Service",
   description: "Aplikasi Kunjungan Petugas Lapangan Royal Ananta Kirtya",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "RAKSI - Royal Ananta Kirtya Field Service",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+import { Viewport } from "next";
+
+export const viewport: Viewport = {
+  themeColor: "#111827",
 };
 
 import Header from "@/components/Header";
