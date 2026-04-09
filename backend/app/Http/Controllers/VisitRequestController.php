@@ -4,31 +4,23 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\Models\VisitRequest;
+use App\Services\VisitRequestService;
+use App\Http\Requests\StoreVisitRequestRequest;
+use App\Transformers\VisitRequestResource;
 
 class VisitRequestController extends Controller
 {
+    public function __construct(private VisitRequestService $visitRequestService) {}
+
     public function index(Request $request)
     {
-        return $request->user()->visitRequests()->with(['location', 'visitType'])->latest()->get();
+        $visitRequests = $request->user()->visitRequests()->with(['location', 'visitType'])->latest()->get();
+        return VisitRequestResource::collection($visitRequests);
     }
 
-    public function store(Request $request)
+    public function store(StoreVisitRequestRequest $request)
     {
-        $validated = $request->validate([
-            'location_id' => 'required|exists:locations,id',
-            'visit_type_id' => 'required|exists:visit_types,id',
-            'notes' => 'nullable|string'
-        ]);
-
-        $visitRequest = VisitRequest::create([
-            'user_id' => $request->user()->id,
-            'location_id' => $validated['location_id'],
-            'visit_type_id' => $validated['visit_type_id'],
-            'notes' => $validated['notes'],
-            'status' => 'pending'
-        ]);
-
-        return response()->json($visitRequest, 201);
+        $visitRequest = $this->visitRequestService->store($request->validated());
+        return response()->json(['message' => 'Visit request created.', 'visitRequest' => $visitRequest], 201);
     }
 }

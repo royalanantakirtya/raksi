@@ -4,47 +4,27 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
+use App\Services\AuthService;
 
 class AuthController extends Controller
 {
+    public function __construct(private AuthService $authService) {}
+
     public function login(Request $request)
     {
-        $request->validate([
-            'kode_user' => 'required',
-            'password' => 'required',
-        ]);
-
-        $user = User::where('kode_user', $request->kode_user)->first();
-
-        if (! $user || ! Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'kode_user' => ['Kredensial yang diberikan salah.'],
-            ]);
-        }
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-            'user' => $user
-        ]);
+        $token = $this->authService->login($request->only(['email', 'password']));
+        return response()->json(['token' => $token]);
     }
 
-    public function logout(Request $request)
+    public function logout()
     {
-        $request->user()->currentAccessToken()->delete();
-
-        return response()->json([
-            'message' => 'Berhasil keluar.'
-        ]);
+        $this->authService->logout();
+        return response()->json(['message' => 'Logged out successfully.']);
     }
 
-    public function me(Request $request)
+    public function me()
     {
-        return response()->json($request->user());
+        $user = $this->authService->me();
+        return response()->json($user);
     }
 }

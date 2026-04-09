@@ -1,46 +1,51 @@
 "use client";
 
-import React, { useState } from 'react';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { User, Lock, Eye, EyeOff, AlertCircle, Loader2, LogIn } from 'lucide-react';
-import api from '@/lib/api';
-import { cn } from '@/lib/utils';
+import React, { useState } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import {
+  User,
+  Lock,
+  Eye,
+  EyeOff,
+  AlertCircle,
+  Loader2,
+  LogIn,
+} from "lucide-react";
+import { login } from "@/services/authService";
+import api from "@/lib/api";
+import { cn } from "@/lib/utils";
 
 export default function LoginPage() {
-  const [kodeUser, setKodeUser] = useState('');
-  const [password, setPassword] = useState('');
+  const [kodeUser, setKodeUser] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const response = await api.post('/login', {
-        kode_user: kodeUser,
-        password: password,
-      });
+      const { token, user } = await login(kodeUser, password);
 
-      const { access_token, user } = response.data;
-      
       // Save token and user info
-      localStorage.setItem('auth_token', access_token);
-      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem("auth_token", token);
+      localStorage.setItem("user", JSON.stringify(user));
 
       // Redirect to dashboard
-      router.push('/');
+      router.push("/");
     } catch (err: unknown) {
-      if (typeof err === 'object' && err !== null && 'response' in err) {
-        const errorData = (err as { response: { data: { message?: string } } }).response.data;
-        setError(errorData.message || 'Login gagal. Cek kembali Kode User dan Password.');
+      if (typeof err === "object" && err !== null && "response" in err) {
+        const errorData = (err as { response: { data: { message?: string } } })
+          .response.data;
+        setError(errorData.message || "Login failed.");
       } else {
-        setError('Terjadi kesalahan pada server. Silakan coba lagi nanti.');
+        setError("An unexpected error occurred.");
       }
     } finally {
       setIsLoading(false);
@@ -53,7 +58,7 @@ export default function LoginPage() {
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-white/5 rounded-full blur-[120px] opacity-20 dark:opacity-5" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-white/5 rounded-full blur-[120px] opacity-10 dark:opacity-5" />
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -61,22 +66,26 @@ export default function LoginPage() {
       >
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-48 h-20 rounded-2xl mb-4 overflow-hidden px-4">
-            <Image 
-              src="/assets/logo-rak.png" 
-              alt="Logo RAK" 
-              width={160} 
-              height={50} 
+            <Image
+              src="/assets/logo-rak.png"
+              alt="Logo RAK"
+              width={160}
+              height={50}
               className="object-contain"
             />
           </div>
-          <h1 className="gold-text-dark dark:gold-text text-3xl font-bold tracking-tight uppercase">RAKSI</h1>
-          <p className="text-accent text-sm mt-1">Sistem Kunjungan Petugas Lapangan</p>
+          <h1 className="gold-text-dark dark:gold-text text-3xl font-bold tracking-tight uppercase">
+            RAKSI
+          </h1>
+          <p className="text-accent text-sm mt-1">
+            Sistem Kunjungan Petugas Lapangan
+          </p>
         </div>
 
         <div className="glass-dark p-8 rounded-3xl space-y-6 border border-white/10">
           <form onSubmit={handleLogin} className="space-y-5">
             {error && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 className="bg-danger/10 border border-danger/20 p-3 rounded-xl flex items-center gap-3 text-danger text-sm"
@@ -87,7 +96,9 @@ export default function LoginPage() {
             )}
 
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-accent uppercase tracking-wider ml-1">Kode User</label>
+              <label className="text-xs font-semibold text-accent uppercase tracking-wider ml-1">
+                Kode User
+              </label>
               <div className="relative group">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-accent group-focus-within:text-secondary transition-colors" />
                 <input
@@ -102,7 +113,9 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-accent uppercase tracking-wider ml-1">Password</label>
+              <label className="text-xs font-semibold text-accent uppercase tracking-wider ml-1">
+                Password
+              </label>
               <div className="relative group">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-accent group-focus-within:text-secondary transition-colors" />
                 <input
@@ -118,7 +131,11 @@ export default function LoginPage() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-accent hover:text-secondary transition-colors"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
               </div>
             </div>
@@ -129,23 +146,25 @@ export default function LoginPage() {
                 disabled={isLoading}
                 className={cn(
                   "w-full maroon-gradient py-4 rounded-2xl text-white font-bold shadow-lg flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all border border-white/10",
-                  isLoading && "opacity-70 cursor-not-allowed"
+                  isLoading && "opacity-70 cursor-not-allowed",
                 )}
               >
-              {isLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <>
-                  <span>MASUK SEKARANG</span>
-                  <LogIn className="w-4 h-4 ml-1" />
-                </>
-              )}
-            </button>
-          </div>
-        </form>
-          
+                {isLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>
+                    <span>MASUK SEKARANG</span>
+                    <LogIn className="w-4 h-4 ml-1" />
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+
           <div className="text-center pt-2">
-            <p className="text-white/30 text-[10px] uppercase tracking-[0.2em]">Developed by PT. Royal Ananta Kirtya</p>
+            <p className="text-white/30 text-[10px] uppercase tracking-[0.2em]">
+              Developed by PT. Royal Ananta Kirtya
+            </p>
           </div>
         </div>
       </motion.div>

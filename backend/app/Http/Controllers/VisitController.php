@@ -3,60 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\Visit;
-use App\Models\VisitResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Services\VisitService;
+use App\Http\Requests\StoreVisitRequest;
 
 class VisitController extends Controller
 {
-    public function store(Request $request)
+    public function __construct(private VisitService $visitService) {}
+
+    public function store(StoreVisitRequest $request)
     {
-        $validated = $request->validate([
-            'kode_kunjungan' => 'required|unique:visits',
-            'tanggal' => 'required|date',
-            'location_id' => 'required|exists:locations,id',
-            'visit_type_id' => 'required|exists:visit_types,id',
-            'terjadwal' => 'required|in:terjadwal,tidak terjadwal',
-            'waktu_mulai' => 'nullable',
-            'waktu_selesai' => 'nullable',
-            'durasi' => 'nullable',
-            'responses' => 'required|array',
-            'responses.*.template_id' => 'required|exists:checklist_templates,id',
-            'responses.*.value' => 'nullable',
-        ]);
-
-        return DB::transaction(function () use ($validated, $request) {
-            $visit = Visit::create([
-                'kode_kunjungan' => $validated['kode_kunjungan'],
-                'tanggal' => $validated['tanggal'],
-                'user_id' => $request->user()->id,
-                'location_id' => $validated['location_id'],
-                'id_mesin' => $request->id_mesin ?? null,
-                'visit_type_id' => $validated['visit_type_id'],
-                'terjadwal' => $validated['terjadwal'],
-                'waktu_mulai' => $validated['waktu_mulai'] ?? null,
-                'waktu_selesai' => $validated['waktu_selesai'] ?? null,
-                'durasi' => $validated['durasi'] ?? null,
-            ]);
-
-            foreach ($validated['responses'] as $resp) {
-                VisitResponse::create([
-                    'visit_id' => $visit->id,
-                    'template_id' => $resp['template_id'],
-                    'value' => $resp['value'],
-                ]);
-            }
-
-            return response()->json([
-                'message' => 'Laporan kunjungan berhasil disimpan.',
-                'visit' => $visit->load('responses')
-            ], 201);
-        });
+        $visit = $this->visitService->store($request->validated(), $request->user()->id);
+        return response()->json(['message' => 'Berhasil disimpan.', 'visit' => $visit], 201);
     }
 
     public function show($id)
     {
         $visit = Visit::with(['user', 'location', 'visitType', 'responses', 'findings'])->findOrFail($id);
-        return response()->json($visit);
+        return new VisitResource($visit);
     }
 }
