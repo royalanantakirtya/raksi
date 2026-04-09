@@ -31,12 +31,12 @@ class VisitController extends Controller
                 'tanggal' => $validated['tanggal'],
                 'user_id' => $request->user()->id,
                 'location_id' => $validated['location_id'],
-                'id_mesin' => $request->id_mesin,
+                'id_mesin' => $request->id_mesin ?? null,
                 'visit_type_id' => $validated['visit_type_id'],
                 'terjadwal' => $validated['terjadwal'],
-                'waktu_mulai' => $validated['waktu_mulai'],
-                'waktu_selesai' => $validated['waktu_selesai'],
-                'durasi' => $validated['durasi'],
+                'waktu_mulai' => $validated['waktu_mulai'] ?? null,
+                'waktu_selesai' => $validated['waktu_selesai'] ?? null,
+                'durasi' => $validated['durasi'] ?? null,
             ]);
 
             foreach ($validated['responses'] as $resp) {
