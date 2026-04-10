@@ -3,19 +3,21 @@
 namespace App\Services;
 
 use App\Models\Schedule;
+use App\Repositories\ScheduleRepositoryInterface;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 
 class ScheduleService
 {
-  public function getSchedules(array $filters)
-  {
-    $query = Schedule::query();
+    public function __construct(private ScheduleRepositoryInterface $scheduleRepository) {}
 
-    if (isset($filters['date'])) {
-      $query->where('date', $filters['date']);
+    public function getSchedules(array $filters = []): Collection
+    {
+        return $this->scheduleRepository->getSchedules($filters);
     }
 
-    // Add more filters as needed
-
-    return $query->get();
-  }
+    public function findById(int $id): Schedule
+    {
+        return $this->scheduleRepository->findById($id);
+    }
 }

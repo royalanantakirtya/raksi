@@ -14,10 +14,22 @@ class StoreVisitRequest extends FormRequest
   public function rules(): array
   {
     return [
-      'kode_kunjungan' => 'required|string|max:255',
-      'responses' => 'required|array',
-      'responses.*.template_id' => 'required|integer|exists:templates,id',
-      'responses.*.value' => 'required|string',
+      'kode_kunjungan'          => 'required|unique:visits',
+      'tanggal'                 => 'required|date',
+      'location_id'             => 'required|exists:locations,id',
+      'visit_type_id'           => 'required|exists:visit_types,id',
+      'terjadwal'               => 'required|in:terjadwal,tidak terjadwal',
+      'waktu_mulai'             => 'nullable',
+      'waktu_selesai'           => 'nullable',
+      'durasi'                  => 'nullable',
+      'responses'               => 'required|array',
+      'responses.*.template_id' => 'required|exists:checklist_templates,id',
+      'responses.*.value'       => 'nullable',
+      // Findings support
+      'findings'                => 'nullable|array',
+      'findings.*.temuan'       => 'required|string',
+      'findings.*.foto_temuan'  => 'nullable|file|image|max:5120',
+      'findings.*.keterangan'   => 'nullable|string',
     ];
   }
 }

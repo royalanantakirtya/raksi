@@ -14,10 +14,9 @@ class StoreVisitRequestRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'location_id' => 'required|exists:locations,id',
+            'location_id'  => 'required|exists:locations,id',
             'visit_type_id' => 'required|exists:visit_types,id',
-            'date' => 'required|date',
-            'time' => 'required|date_format:H:i',
+            'notes'        => 'nullable|string',
         ];
     }
 }

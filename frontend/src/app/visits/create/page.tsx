@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Loader2,
@@ -10,12 +10,22 @@ import {
   CheckCircle2,
   ListChecks,
   Info,
-  ChevronRight,
+  ChevronDown,
+  Camera,
+  Plus,
+  Trash2,
 } from "lucide-react";
 import { useVisitForm } from "@/hooks/useVisitForm";
-import cn from "classnames";
 
-function VisitFormContent() {
+interface ChecklistField {
+  id: number;
+  label: string;
+  field_type: string;
+  options?: string[];
+  is_required: boolean;
+}
+
+function VisitCreateContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const scheduleId = searchParams.get("schedule_id");
@@ -26,68 +36,99 @@ function VisitFormContent() {
     schedule,
     template,
     responses,
+    findings,
     isLoading,
     isSubmitting,
     error,
     success,
+    handleInputChange,
+    addFinding,
+    updateFinding,
+    removeFinding,
     submitForm,
   } = useVisitForm(scheduleId, locationId, visitTypeId);
+
+  const [openSections, setOpenSections] = useState<string[]>(["kondisi"]);
+
+  const toggleSection = (section: string) => {
+    setOpenSections((prev) =>
+      prev.includes(section) ? prev.filter((s) => s !== section) : [...prev, section]
+    );
+  };
 
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center pt-20 space-y-4">
         <Loader2 className="w-10 h-10 animate-spin text-secondary" />
-        <p className="text-accent text-sm font-medium">
+        <p className="text-zinc-500 text-sm font-medium">
           Menyiapkan Checklist...
         </p>
       </div>
     );
   }
 
-  if (!schedule || !template) return null;
+  if (!schedule || !template) {
+    return (
+      <div className="p-6 text-center">
+        <p className="text-danger font-bold">Data tidak ditemukan.</p>
+        <button onClick={() => router.back()} className="mt-4 text-accent underline underline-offset-4">Kembali</button>
+      </div>
+    );
+  }
+
+  const kondisiFields = template.checklist_templates?.filter((f: ChecklistField) => f.field_type !== 'file') || [];
+  const visualFields = template.checklist_templates?.filter((f: ChecklistField) => f.field_type === 'file') || [];
 
   return (
-    <div className="space-y-6 pb-20">
-      {/* Top Action Bar */}
+    <div className="space-y-6 pb-24">
+      {/* Header Action Bar */}
       <div className="flex items-center justify-between">
         <button
           onClick={() => router.back()}
-          className="p-2 rounded-xl bg-white/5 border border-white/5 text-white/70 active:scale-90 transition-all font-black text-xs flex items-center gap-2"
+          className="p-2 rounded-xl bg-white/5 border border-white/10 text-white/70 active:scale-95 transition-all text-xs flex items-center gap-2"
         >
           <ChevronLeft className="w-4 h-4" /> Batal
         </button>
-        <span className="text-[10px] uppercase font-black bg-secondary/10 text-secondary px-3 py-1 rounded-full tracking-wider border border-secondary/10">
-          REPORT #{scheduleId}
-        </span>
+        <div className="flex flex-col items-end">
+          <span className="text-[9px] uppercase font-black text-secondary tracking-widest px-2 py-0.5 rounded bg-secondary/10 border border-secondary/10">
+            {scheduleId ? `Schedule #${scheduleId}` : "Unplanned"}
+          </span>
+        </div>
       </div>
 
-      <div className="space-y-6">
-        {/* Header Info */}
+      <div className="space-y-8">
+        {/* Page Title */}
         <section className="space-y-2">
-          <div className="flex items-center gap-2 text-accent text-[10px] font-black uppercase tracking-widest">
+          <div className="flex items-center gap-2 text-accent text-[10px] font-black uppercase tracking-[0.2em]">
             <ListChecks className="w-4 h-4 text-secondary" />
-            <span>Pengisian Laporan</span>
+            <span>Laporan Kunjungan</span>
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-white uppercase">
+          <h2 className="text-2xl font-black tracking-tight text-white uppercase leading-tight">
             {schedule.location?.lokasi || "Lokasi"}
           </h2>
-          <div className="flex items-center gap-2 text-white/40 text-[10px] font-bold uppercase tracking-wider">
+          <div className="flex items-center gap-2 text-white/40 text-[10px] font-bold uppercase tracking-wider bg-white/5 w-fit px-3 py-1 rounded-full">
             <Info className="w-3 h-3" />
-            <span>Target: {template.nama_tipe}</span>
+            <span>{template.nama_tipe}</span>
           </div>
         </section>
 
-        {/* Success / Error Messages */}
+        {/* Global Messages */}
         {success && (
-          <div className="p-6 rounded-[2rem] bg-success/10 border border-success/20 text-success flex flex-col items-center gap-3 text-center">
-            <CheckCircle2 className="w-10 h-10" />
-            <div className="space-y-1">
-              <p className="text-sm font-black uppercase tracking-wider">
-                Berhasil Disimpan!
+          <div className="p-8 rounded-[2.5rem] maroon-gradient border border-white/10 text-white flex flex-col items-center gap-4 text-center shadow-2xl animate-in zoom-in duration-300">
+            <div className="w-16 h-16 rounded-full bg-success/20 flex items-center justify-center border border-success/30">
+               <CheckCircle2 className="w-10 h-10 text-success" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xl font-black uppercase tracking-wider">Berhasil Terkirim!</h3>
+              <p className="text-sm text-white/70 leading-relaxed">
+                Laporan kunjungan Anda telah diverifikasi dan disimpan di server.
               </p>
-              <p className="text-xs opacity-80">
-                Laporan Anda sedang kami proses...
-              </p>
+              <button 
+                 onClick={() => router.push('/')}
+                 className="mt-6 w-full py-4 bg-white text-primary rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg hover:bg-secondary transition-colors"
+              >
+                Kembali ke Beranda
+              </button>
             </div>
           </div>
         )}
@@ -95,172 +136,227 @@ function VisitFormContent() {
         {error && (
           <div className="p-4 rounded-2xl bg-danger/10 border border-danger/20 text-danger text-xs flex gap-3 items-center">
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
-            <span>{error}</span>
+            <p className="font-bold">{error}</p>
           </div>
         )}
 
-        {/* Dynamic Form */}
         {!success && (
           <form onSubmit={submitForm} className="space-y-4">
-            {template.checklist_templates?.map(
-              (field: ChecklistTemplate, idx: number) => (
-                <div
-                  key={field.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.05 }}
-                  className="maroon-gradient p-6 rounded-4xl border border-white/10 space-y-4 shadow-xl"
-                >
-                  <div className="space-y-1">
-                    <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-1">
-                      Parameter {idx + 1}
-                    </p>
-                    <label className="text-sm font-bold leading-relaxed">
-                      {field.label}
-                    </label>
+            
+            {/* 1. KONDISI LOKASI SECTION */}
+            <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm">
+              <button 
+                type="button"
+                onClick={() => toggleSection('kondisi')}
+                className="w-full flex items-center justify-between p-6 text-left active:bg-white/5 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center">
+                    <ListChecks className="w-5 h-5 text-secondary" />
                   </div>
-
-                  {/* Text Type */}
-                  {field.field_type === "text" && (
-                    <input
-                      type="text"
-                      required
-                      value={responses[field.id] || ""}
-                      onChange={(e) =>
-                        handleInputChange(field.id, e.target.value)
-                      }
-                      placeholder="Masukkan keterangan..."
-                      className="w-full bg-white/5 border border-white/5 rounded-2xl py-3.5 px-5 text-sm text-white focus:outline-none focus:border-secondary/30 transition-all placeholder:text-white/20"
-                    />
-                  )}
-
-                  {/* Number Type */}
-                  {field.field_type === "number" && (
-                    <input
-                      type="number"
-                      required
-                      value={responses[field.id] || ""}
-                      onChange={(e) =>
-                        handleInputChange(field.id, e.target.value)
-                      }
-                      placeholder="0"
-                      className="w-full bg-white/5 border border-white/5 rounded-2xl py-3.5 px-5 text-sm text-white focus:outline-none focus:border-secondary/30 transition-all placeholder:text-white/20"
-                    />
-                  )}
-
-                  {/* Select Type with dynamic options */}
-                  {field.field_type === "select" && field.options && (
-                    <div className="relative">
-                      <select
-                        value={responses[field.id] || ""}
-                        onChange={(e) =>
-                          handleInputChange(field.id, e.target.value)
-                        }
-                        required
-                        className="w-full bg-white/5 border border-white/5 rounded-2xl py-3.5 px-5 text-sm text-white focus:outline-none focus:border-secondary/30 transition-all appearance-none"
-                      >
-                        <option value="" className="bg-surface text-white">
-                          -- Pilih Status --
-                        </option>
-                        {field.options.map((opt: string) => (
-                          <option
-                            key={opt}
-                            value={opt}
-                            className="bg-surface text-white"
-                          >
-                            {opt}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 rotate-90" />
-                    </div>
-                  )}
-
-                  {/* File / Camera Type */}
-                  {field.field_type === "file" && (
-                    <div className="space-y-3">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        capture="environment"
-                        onChange={(e) =>
-                          handleInputChange(
-                            field.id,
-                            e.target.files?.[0]?.name || "",
-                          )
-                        }
-                        className="hidden"
-                        id={`file-${field.id}`}
-                      />
-                      <label
-                        htmlFor={`file-${field.id}`}
-                        className="flex items-center gap-3 p-4 rounded-2xl bg-white/5 border border-dashed border-white/20 text-accent hover:border-secondary/50 hover:bg-white/10 transition-all cursor-pointer active:scale-[0.98]"
-                      >
-                        <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
-                          <Save className="w-5 h-5 text-secondary" />
-                        </div>
-                        <span className="text-xs font-bold uppercase tracking-wider">
-                          {responses[field.id]
-                            ? "Ganti Foto"
-                            : "Ambil Foto Sekarang"}
-                        </span>
+                  <div>
+                    <h3 className="text-sm font-black text-white uppercase tracking-wider">Kondisi Lokasi</h3>
+                    <p className="text-[10px] text-white/40 font-bold uppercase">{kondisiFields.length} Parameter</p>
+                  </div>
+                </div>
+                <ChevronDown className={`w-5 h-5 text-white/30 transition-transform duration-300 ${openSections.includes('kondisi') ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {openSections.includes('kondisi') && (
+                <div className="p-6 pt-0 space-y-6 border-t border-white/5">
+                  {kondisiFields.map((field: ChecklistField) => (
+                    <div key={field.id} className="space-y-3">
+                      <label className="text-xs font-bold text-white/60 uppercase tracking-widest flex justify-between">
+                        {field.label}
+                        {field.is_required && <span className="text-secondary text-[10px]">*Wajib</span>}
                       </label>
-                      {responses[field.id] && (
-                        <div className="flex items-center gap-2 px-2">
-                          <CheckCircle2 className="w-4 h-4 text-success" />
-                          <p className="text-[10px] text-white/50 font-medium truncate">
-                            {responses[field.id]}
-                          </p>
+                      
+                      {field.field_type === 'select' ? (
+                        <div className="relative">
+                          <select
+                            required={field.is_required}
+                            value={responses[field.id.toString()] as string || ""}
+                            onChange={(e) => handleInputChange(field.id.toString(), e.target.value)}
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-sm text-white focus:outline-none focus:border-secondary/30 transition-all appearance-none"
+                          >
+                            <option value="" className="bg-zinc-900">-- Pilih Opsi --</option>
+                            {field.options?.map(opt => <option key={opt} value={opt} className="bg-zinc-900">{opt}</option>)}
+                          </select>
+                          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 pointer-events-none" />
                         </div>
+                      ) : (
+                        <input
+                          type={field.field_type === 'number' ? 'number' : 'text'}
+                          required={field.is_required}
+                          placeholder={`Isi ${field.label.toLowerCase()}...`}
+                          value={responses[field.id.toString()] as string || ""}
+                          onChange={(e) => handleInputChange(field.id.toString(), e.target.value)}
+                          className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-sm text-white focus:outline-none focus:border-secondary/30 transition-all placeholder:text-white/20"
+                        />
                       )}
                     </div>
-                  )}
-
-                  {/* Legacy Choice / Select Type (for backward compatibility) */}
-                  {field.field_type === "choice" && (
-                    <select
-                      value={responses[field.id] || ""}
-                      onChange={(e) =>
-                        handleInputChange(field.id, e.target.value)
-                      }
-                      required
-                      className="w-full bg-white/5 border border-white/5 rounded-2xl py-3.5 px-5 text-sm text-white focus:outline-none focus:border-secondary/30 transition-all appearance-none"
-                    >
-                      <option value="" className="bg-surface text-white">
-                        -- Pilih Status --
-                      </option>
-                      <option value="BAIK" className="bg-surface text-white">
-                        BAIK
-                      </option>
-                      <option value="RUSAK" className="bg-surface text-white">
-                        RUSAK
-                      </option>
-                      <option
-                        value="PERLU PERBAIKAN"
-                        className="bg-surface text-white"
-                      >
-                        PERLU PERBAIKAN
-                      </option>
-                    </select>
-                  )}
+                  ))}
                 </div>
-              ),
-            )}
+              )}
+            </div>
+
+            {/* 2. VISUAL LOKASI SECTION */}
+            <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm">
+              <button 
+                type="button"
+                onClick={() => toggleSection('visual')}
+                className="w-full flex items-center justify-between p-6 text-left"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
+                    <Camera className="w-5 h-5 text-accent" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-white uppercase tracking-wider">Visual Lokasi</h3>
+                    <p className="text-[10px] text-white/40 font-bold uppercase">{visualFields.length} Foto Wajib</p>
+                  </div>
+                </div>
+                <ChevronDown className={`w-5 h-5 text-white/30 transition-transform duration-300 ${openSections.includes('visual') ? 'rotate-180' : ''}`} />
+              </button>
+
+              {openSections.includes('visual') && (
+                <div className="p-6 pt-0 grid grid-cols-1 gap-4 border-t border-white/5">
+                  {visualFields.map((field: ChecklistField) => (
+                    <div key={field.id} className="relative group">
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        capture="camera"
+                        className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer"
+                        onChange={(e) => {
+                          if (e.target.files?.[0]) handleInputChange(field.id.toString(), e.target.files[0]);
+                        }}
+                      />
+                      <div className={`p-4 rounded-2xl border-2 border-dashed transition-all flex items-center justify-between ${
+                        responses[field.id.toString()] ? 'bg-success/5 border-success/30' : 'bg-white/5 border-white/10 group-hover:border-accent/40'
+                      }`}>
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${responses[field.id.toString()] ? 'bg-success/20' : 'bg-white/5'}`}>
+                            {responses[field.id.toString()] ? <CheckCircle2 className="w-5 h-5 text-success" /> : <Camera className="w-5 h-5 text-white/20" />}
+                          </div>
+                          <div>
+                            <p className="text-xs font-bold text-white uppercase tracking-wider">{field.label}</p>
+                            <p className="text-[10px] text-white/40 uppercase font-black uppercase tracking-tighter">
+                              {responses[field.id.toString()] ? (responses[field.id.toString()] as File).name : 'Ambil Foto'}
+                            </p>
+                          </div>
+                        </div>
+                        <Plus className="w-4 h-4 text-white/20" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* 3. TEMUAN SECTION */}
+            <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm">
+              <button 
+                type="button"
+                onClick={() => toggleSection('temuan')}
+                className="w-full flex items-center justify-between p-6 text-left"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-danger/10 flex items-center justify-center">
+                    <AlertCircle className="w-5 h-5 text-danger" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-white uppercase tracking-wider">Temuan Permasalahan</h3>
+                    <p className="text-[10px] text-white/40 font-bold uppercase">{findings.length} Kasus Ditemukan</p>
+                  </div>
+                </div>
+                <ChevronDown className={`w-5 h-5 text-white/30 transition-transform duration-300 ${openSections.includes('temuan') ? 'rotate-180' : ''}`} />
+              </button>
+
+              {openSections.includes('temuan') && (
+                <div className="p-6 pt-0 space-y-4 border-t border-white/5">
+                  {findings.map((finding: ChecklistFinding) => (
+                    <div key={finding.id} className="maroon-gradient rounded-2xl p-4 border border-white/10 relative space-y-4">
+                      <button 
+                        type="button" 
+                        onClick={() => removeFinding(finding.id)}
+                        className="absolute top-4 right-4 text-white/30 hover:text-white"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                      
+                      <div className="space-y-3">
+                        <label className="text-[10px] font-black uppercase text-secondary tracking-[0.1em]">Jenis Temuan</label>
+                        <select 
+                          value={finding.temuan}
+                          onChange={(e) => updateFinding(finding.id, { temuan: e.target.value })}
+                          className="w-full bg-white/10 border border-white/10 rounded-xl py-3 px-4 text-xs text-white"
+                        >
+                          <option value="" className="bg-zinc-800">-- Pilih Temuan --</option>
+                          <option value="Kebersihan" className="bg-zinc-800">Kebersihan</option>
+                          <option value="Kerusakan Fisik" className="bg-zinc-800">Kerusakan Fisik</option>
+                          <option value="Kelistrikan" className="bg-zinc-800">Kelistrikan</option>
+                          <option value="Lainnya" className="bg-zinc-800">Lainnya</option>
+                        </select>
+                      </div>
+
+                      <div className="space-y-3">
+                        <label className="text-[10px] font-black uppercase text-secondary tracking-[0.1em]">Foto Temuan</label>
+                        <div className="relative">
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            capture="camera"
+                            className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer"
+                            onChange={(e) => {
+                              if (e.target.files?.[0]) updateFinding(finding.id, { foto_temuan: e.target.files[0] });
+                            }}
+                          />
+                          <div className={`py-4 px-5 rounded-xl border border-dashed flex items-center gap-3 ${finding.foto_temuan ? 'bg-success/10 border-success/30' : 'bg-white/5 border-white/10'}`}>
+                            <Camera className="w-4 h-4 text-white/20" />
+                            <span className="text-[10px] text-white/50 uppercase font-black truncate max-w-[150px]">
+                              {finding.foto_temuan ? finding.foto_temuan.name : 'Upload Foto'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3">
+                        <label className="text-[10px] font-black uppercase text-secondary tracking-[0.1em]">Catatan / Keterangan</label>
+                        <textarea 
+                          placeholder="Jelaskan temuan secara rinci..."
+                          value={finding.keterangan}
+                          onChange={(e) => updateFinding(finding.id, { keterangan: e.target.value })}
+                          className="w-full bg-white/10 border border-white/10 rounded-xl py-3 px-4 text-xs text-white h-20"
+                        />
+                      </div>
+                    </div>
+                  ))}
+
+                  <button 
+                    type="button"
+                    onClick={addFinding}
+                    className="w-full py-4 border-2 border-dashed border-white/10 rounded-2xl flex items-center justify-center gap-2 text-white/40 hover:text-white transition-all text-xs font-black uppercase tracking-widest"
+                  >
+                    <Plus className="w-4 h-4" /> Tambah Temuan Baru
+                  </button>
+                </div>
+              )}
+            </div>
 
             <button
               type="submit"
               disabled={isSubmitting}
-              className={cn(
-                "w-full py-5 rounded-[2rem] maroon-gradient text-white font-black text-sm uppercase tracking-[0.2em] shadow-2xl flex items-center justify-center gap-3 active:scale-[0.97] transition-all mt-6",
-                isSubmitting && "opacity-70 cursor-not-allowed",
-              )}
+              className={`w-full py-6 rounded-3xl maroon-gradient text-white font-black text-sm uppercase tracking-[0.3em] shadow-[0_20px_50px_rgba(150,0,0,0.3)] flex items-center justify-center gap-3 active:scale-[0.98] transition-all mt-10 ${
+                isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+              }`}
             >
               {isSubmitting ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <Loader2 className="w-6 h-6 animate-spin" />
               ) : (
                 <>
-                  <Save className="w-5 h-5" />
-                  Simpan Laporan
+                  <Save className="w-5 h-5 shadow-lg" />
+                  Kirim Laporan Akhir
                 </>
               )}
             </button>
@@ -272,61 +368,14 @@ function VisitFormContent() {
 }
 
 export default function VisitCreatePage() {
-  const searchParams = useSearchParams();
-  const scheduleId = searchParams.get("schedule_id");
-  const locationId = searchParams.get("location_id");
-  const visitTypeId = searchParams.get("visit_type_id");
-
-  const {
-    schedule,
-    template,
-    responses,
-    isLoading,
-    isSubmitting,
-    error,
-    success,
-    submitForm,
-  } = useVisitForm(scheduleId, locationId, visitTypeId);
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
   return (
-    <div>
-      <h1>Create Visit</h1>
-      {error && <p>{error}</p>}
-      {success && <p>Visit created successfully!</p>}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          submitForm(responses);
-        }}
-      >
-        {/* Render form fields dynamically based on `template` */}
-        <button type="submit" disabled={isSubmitting}>
-          Submit
-        </button>
-      </form>
-    </div>
+    <Suspense fallback={
+      <div className="flex flex-col items-center justify-center pt-20 space-y-4">
+        <Loader2 className="w-10 h-10 animate-spin text-secondary" />
+        <p className="text-zinc-500 text-sm font-medium">Memuat Halaman...</p>
+      </div>
+    }>
+      <VisitCreateContent />
+    </Suspense>
   );
 }
-
-// Define 'ChecklistTemplate'
-interface ChecklistTemplate {
-  id: string;
-  label: string;
-  field_type: string;
-  options?: string[];
-}
-
-// Define 'handleInputChange'
-const handleInputChange = (id: string, value: string) => {
-  // Implement the function
-};
-
-// Adjust 'submitForm' type
-const submitForm = (event: React.FormEvent<HTMLFormElement>) => {
-  event.preventDefault();
-  // Implement form submission logic
-};

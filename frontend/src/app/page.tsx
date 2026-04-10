@@ -16,17 +16,11 @@ import {
 import { useDashboardStats } from "@/hooks/useDashboardStats";
 import { useAuth } from "@/hooks/useAuth";
 
-interface NewsItem {
-  id: number;
-  title: string;
-  date: string;
-  content: string;
-}
-
 export default function Home() {
   const router = useRouter();
   const { user, isChecking } = useAuth();
-  const { stats, approvedRequests, isLoading } = useDashboardStats();
+  const { stats, approvedRequests, news, isLoading } = useDashboardStats();
+
 
   if (isChecking || isLoading) {
     return (

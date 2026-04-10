@@ -32,20 +32,28 @@ export default function SchedulesPage() {
     setIsLoading(true);
     try {
       const response = await api.get('/schedules');
-      setSchedules(response.data);
+      // Extremely defensive data extraction
+      const rawData = response?.data;
+      const schedulesArray = rawData?.data || rawData || [];
+      setSchedules(Array.isArray(schedulesArray) ? schedulesArray : []);
     } catch (err) {
       console.error("Error fetching schedules:", err);
       setError("Gagal mengambil data jadwal.");
+      setSchedules([]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const filteredSchedules = schedules.filter(s => 
-    s.location.lokasi.toLowerCase().includes(search.toLowerCase()) ||
-    s.location.kode_lokasi.toLowerCase().includes(search.toLowerCase()) ||
-    s.location.alamat.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredSchedules = (Array.isArray(schedules) ? schedules : []).filter(s => {
+    if (!s || !s.location) return false;
+    const searchLower = search.toLowerCase();
+    return (
+      (s.location.lokasi?.toLowerCase() || "").includes(searchLower) ||
+      (s.location.kode_lokasi?.toLowerCase() || "").includes(searchLower) ||
+      (s.location.alamat?.toLowerCase() || "").includes(searchLower)
+    );
+  });
 
   if (isLoading) {
     return (

@@ -4,28 +4,89 @@ namespace App\Services;
 
 use App\Models\Visit;
 use App\Models\VisitResponse;
+use App\Repositories\VisitRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * VisitService - Ver: 1.0.5 (Last Sync: 2026-04-10)
+ */
 class VisitService
 {
-  public function store(array $data, int $userId): Visit
-  {
-    return DB::transaction(function () use ($data, $userId) {
-      $visit = Visit::create([
-        'kode_kunjungan' => $data['kode_kunjungan'],
-        'user_id' => $userId,
-        // ... other fields
-      ]);
+    public function __construct(private VisitRepositoryInterface $visitRepository) {}
 
-      foreach ($data['responses'] as $response) {
-        VisitResponse::create([
-          'visit_id' => $visit->id,
-          'template_id' => $response['template_id'],
-          'value' => $response['value'],
-        ]);
-      }
+    public function store(array $data, int $userId): Visit
+    {
+        return DB::transaction(function () use ($data, $userId) {
+            $visit = $this->visitRepository->create([
+                'kode_kunjungan' => $data['kode_kunjungan'],
+                'tanggal'        => $data['tanggal'],
+                'user_id'        => $userId,
+                'location_id'    => $data['location_id'],
+                'id_mesin'       => $data['id_mesin'] ?? null,
+                'visit_type_id'  => $data['visit_type_id'],
+                'terjadwal'      => $data['terjadwal'],
+                'waktu_mulai'    => $data['waktu_mulai'] ?? null,
+                'waktu_selesai'  => $data['waktu_selesai'] ?? null,
+                'durasi'         => $data['durasi'] ?? null,
+            ]);
 
-      return $visit->load('responses');
-    });
-  }
+            // Save Responses
+            foreach ($data['responses'] as $resp) {
+                $value = $resp['value'];
+                
+                // Handle file uploads in responses if passed as file objects
+                if ($value instanceof \Illuminate\Http\UploadedFile) {
+                    $path = $value->store('uploads/responses', 'public');
+                    $value = $path;
+                }
+
+                VisitResponse::create([
+                    'visit_id'    => $visit->id,
+                    'template_id' => $resp['template_id'],
+                    'value'       => $value,
+                ]);
+            }
+
+            // Save Findings
+            if (!empty($data['findings'])) {
+                foreach ($data['findings'] as $findingData) {
+                    $fotoPath = null;
+                    if (isset($findingData['foto_temuan']) && $findingData['foto_temuan'] instanceof \Illuminate\Http\UploadedFile) {
+                        $fotoPath = $findingData['foto_temuan']->store('uploads/findings', 'public');
+                    }
+
+                    // Generate Ticket Number (Legacy style: UserID + YYMMDD + HHMMSS + Rand)
+                    $user = \App\Models\User::find($userId);
+                    $kodeUser = $user ? substr($user->kode_user, -6) : '000000';
+                    $ticket = $kodeUser . date('ymdHis') . rand(100, 999);
+
+                    \App\Models\Finding::create([
+                        'nomor_tiket' => $ticket,
+                        'visit_id'    => $visit->id,
+                        'tanggal'     => $data['tanggal'],
+                        'user_id'     => $userId,
+                        'location_id' => $data['location_id'],
+                        'temuan'      => $findingData['temuan'],
+                        'foto_temuan' => $fotoPath,
+                        'status'      => 'open',
+                    ]);
+                }
+            }
+
+            return $visit->load(['responses', 'findings']);
+        });
+    }
+
+    public function findById(int $id): Visit
+    {
+        return $this->visitRepository->findById($id);
+    }
+
+    /**
+     * fetchAllVisits - Unique method for history records
+     */
+    public function fetchAllVisits(): \Illuminate\Database\Eloquent\Collection
+    {
+        return $this->visitRepository->getAll();
+    }
 }

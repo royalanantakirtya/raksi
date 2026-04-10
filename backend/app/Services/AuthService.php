@@ -3,44 +3,40 @@
 namespace App\Services;
 
 use App\Models\User;
+use App\Repositories\UserRepositoryInterface;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
-use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Validation\ValidationException;
 
 class AuthService
 {
-  public function __construct()
-  {
-    if (!in_array(HasApiTokens::class, class_uses(User::class))) {
-      throw new \Exception('User model must use HasApiTokens trait for Sanctum.');
+    public function __construct(private UserRepositoryInterface $userRepository) {}
+
+    public function login(string $kodeUser, string $password): array
+    {
+        $user = $this->userRepository->findByKodeUser($kodeUser);
+
+        if (!$user || !Hash::check($password, $user->password)) {
+            throw ValidationException::withMessages([
+                'kode_user' => ['Kredensial yang diberikan salah.'],
+            ]);
+        }
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+        
+        return [
+            'token' => $token,
+            'user' => $user
+        ];
     }
-  }
 
-  public function login(array $credentials)
-  {
-    $user = User::where('email', $credentials['email'])->first();
-
-    if (!$user || !Hash::check($credentials['password'], $user->password)) {
-      throw new \Exception('Invalid credentials');
+    public function logout(Request $request): void
+    {
+        $request->user()->currentAccessToken()->delete();
     }
 
-    return $user->createToken('auth_token')->plainTextToken;
-  }
-
-  public function logout()
-  {
-    Auth::user()->tokens()->delete();
-  }
-
-  public function me()
-  {
-    return Auth::user();
-  }
-
-  // Debug tokens method
-  public function debugTokens()
-  {
-    $tokens = Auth::user()->tokens();
-    dd($tokens);
-  }
+    public function me(Request $request): User
+    {
+        return $request->user();
+    }
 }
