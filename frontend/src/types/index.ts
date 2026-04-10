@@ -97,3 +97,12 @@ export interface Visit {
   updated_at?: string;
   responses?: VisitResponse[];
 }
+
+export interface NewsItem {
+  id: number;
+  title: string;
+  content: string;
+  date: string;
+  created_at?: string;
+  updated_at?: string;
+}

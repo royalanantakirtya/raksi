@@ -7,17 +7,25 @@ import { usePathname } from 'next/navigation';
 import { LogOut, User as UserIcon } from 'lucide-react';
 
 export default function Header() {
-  const [userName, setUserName] = useState('Petugas');
+  const [userName, setUserName] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const userData = localStorage.getItem('user');
+      if (userData && userData !== 'undefined') {
+        try {
+          const user = JSON.parse(userData);
+          if (user && typeof user === 'object' && 'nama_user' in user) {
+            return user.nama_user || 'Petugas';
+          }
+        } catch (err) {
+          console.error('Failed to parse user data:', err);
+        }
+      }
+    }
+    return 'Petugas';
+  });
+
   const router = useRouter();
   const pathname = usePathname();
-
-  useEffect(() => {
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      const user = JSON.parse(userData);
-      setUserName(user.nama_user || 'Petugas');
-    }
-  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('auth_token');

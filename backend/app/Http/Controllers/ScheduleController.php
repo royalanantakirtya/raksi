@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Services\ScheduleService;
+use App\Http\Resources\ScheduleResource;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
-use App\Models\Schedule;
 
 class ScheduleController extends Controller
 {
@@ -13,13 +12,16 @@ class ScheduleController extends Controller
 
     public function index(Request $request)
     {
-        $schedules = $this->scheduleService->getSchedules($request->all());
+        $filters = $request->all();
+        $filters['user_id'] = $request->user()->id;
+        $schedules = $this->scheduleService->getSchedules($filters);
         return ScheduleResource::collection($schedules);
     }
 
-    public function show($id)
+    public function show(int $id)
     {
-        $schedule = Schedule::with(['location', 'visitType', 'user'])->findOrFail($id);
+        $schedule = $this->scheduleService->findById($id);
         return new ScheduleResource($schedule);
     }
 }
+

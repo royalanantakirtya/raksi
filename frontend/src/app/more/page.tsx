@@ -8,22 +8,33 @@ import {
   LogOut, 
   ChevronLeft,
   ChevronRight,
-  Shield,
-  CreditCard,
   HelpCircle,
   Smartphone
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
+export interface UserSession {
+  id: number;
+  nama_user: string;
+  kode_user: string;
+  peran: string;
+  cabang: string;
+}
+
 export default function MorePage() {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
-
-  useEffect(() => {
-    const userData = localStorage.getItem("user");
-    if (userData) setUser(JSON.parse(userData));
-  }, []);
+  
+  // Lazy initialization to prevent cascading renders
+  const [user, setUser] = useState<UserSession | null>(() => {
+    if (typeof window === "undefined") return null;
+    try {
+      const userData = localStorage.getItem("user");
+      return userData ? JSON.parse(userData) : null;
+    } catch (e) {
+      return null;
+    }
+  });
 
   const handleLogout = () => {
     localStorage.removeItem("auth_token");

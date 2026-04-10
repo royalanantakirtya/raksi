@@ -18,12 +18,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/locations', [LocationController::class, 'index']);
     Route::get('/schedules', [ScheduleController::class, 'index']);
     Route::get('/schedules/{id}', [ScheduleController::class, 'show']);
+    
+    Route::get('/visits', [VisitController::class, 'index']);
     Route::post('/visits', [VisitController::class, 'store']);
     Route::get('/visits/{id}', [VisitController::class, 'show']);
+    
     Route::get('/visit-types', [VisitTypeController::class, 'index']);
     Route::get('/visit-types/{id}', [VisitTypeController::class, 'show']);
 
     // Visit Requests (Unscheduled Approval)
     Route::get('/visit-requests', [\App\Http\Controllers\VisitRequestController::class, 'index']);
     Route::post('/visit-requests', [\App\Http\Controllers\VisitRequestController::class, 'store']);
+
+    Route::get('/news', [\App\Http\Controllers\NewsController::class, 'index']);
 });

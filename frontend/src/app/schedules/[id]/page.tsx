@@ -16,6 +16,7 @@ import {
 import api from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { Schedule } from "@/types";
 
 // Haversine Formula for distance calculation
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -36,7 +37,7 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
 export default function ScheduleDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const [schedule, setSchedule] = useState<any>(null);
+  const [schedule, setSchedule] = useState<Schedule | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
   const [distance, setDistance] = useState<number | null>(null);
@@ -53,7 +54,8 @@ export default function ScheduleDetailPage() {
   const fetchSchedule = async () => {
     try {
       const response = await api.get(`/schedules/${params.id}`);
-      setSchedule(response.data);
+      const data = response.data.data || response.data;
+      setSchedule(data);
     } catch (err) {
       console.error("Error fetching schedule:", err);
       setError("Gagal mengambil rincian jadwal.");
@@ -88,11 +90,13 @@ export default function ScheduleDetailPage() {
 
   useEffect(() => {
     if (userLocation && schedule?.location) {
+      const lat = schedule.location.latitude?.toString() || "0";
+      const lng = schedule.location.longitude?.toString() || "0";
       const d = calculateDistance(
         userLocation.lat,
         userLocation.lng,
-        parseFloat(schedule.location.latitude),
-        parseFloat(schedule.location.longitude)
+        parseFloat(lat),
+        parseFloat(lng)
       );
       setDistance(d);
     }
@@ -111,7 +115,7 @@ export default function ScheduleDetailPage() {
         return;
       }
     }
-    router.push(`/visits/create?schedule_id=${schedule.id}`);
+    router.push(`/visits/create?schedule_id=${schedule?.id}`);
   };
 
   if (isLoading) {
@@ -138,7 +142,7 @@ export default function ScheduleDetailPage() {
           <ChevronLeft className="w-5 h-5" />
         </button>
         <span className="text-[10px] uppercase font-black bg-secondary/10 text-secondary px-3 py-1 rounded-full tracking-wider border border-secondary/10">
-          ID: {schedule.location.kode_lokasi}
+          ID: {schedule?.location?.kode_lokasi || '...'}
         </span>
       </div>
 
@@ -149,10 +153,10 @@ export default function ScheduleDetailPage() {
       >
         {/* Header Summary */}
         <section className="space-y-2">
-          <h2 className="text-2xl font-bold tracking-tight text-white uppercase">{schedule.location.lokasi}</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-white uppercase">{schedule?.location?.lokasi || 'Lokasi'}</h2>
           <div className="flex items-center gap-2 text-accent text-xs font-semibold uppercase tracking-wider">
             <Info className="w-3.5 h-3.5 text-secondary" />
-            <span>Tipe: {schedule.visit_type.nama_tipe}</span>
+            <span>Tipe: {schedule?.visit_type?.nama_tipe || 'Kunjungan'}</span>
           </div>
         </section>
 
@@ -165,7 +169,7 @@ export default function ScheduleDetailPage() {
               </div>
               <div className="space-y-1">
                 <p className="text-[10px] text-white/40 uppercase font-black tracking-widest">Alamat Lengkap</p>
-                <p className="text-sm font-medium leading-relaxed">{schedule.location.alamat}</p>
+                <p className="text-sm font-medium leading-relaxed">{schedule?.location?.alamat || '-'}</p>
               </div>
             </div>
 
@@ -175,7 +179,9 @@ export default function ScheduleDetailPage() {
               </div>
               <div className="space-y-1 flex-1">
                 <p className="text-[10px] text-white/40 uppercase font-black tracking-widest">Koordinat Lokasi</p>
-                <p className="text-xs font-mono text-accent">{schedule.location.latitude}, {schedule.location.longitude}</p>
+                <p className="text-xs font-mono text-accent">
+                  {schedule?.location?.latitude || '0'}, {schedule?.location?.longitude || '0'}
+                </p>
               </div>
               <button 
                 onClick={openInMaps}
