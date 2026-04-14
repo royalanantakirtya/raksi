@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import api from "@/lib/api";
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
+
 import { Schedule } from "@/types";
 
 export default function SchedulesPage() {

@@ -22,6 +22,15 @@ class EloquentScheduleRepository implements ScheduleRepositoryInterface
             $query->where('tanggal', Carbon::today()->toDateString());
         }
 
+        // Filter out schedules that already have a visit record
+        $query->whereNotExists(function ($q) {
+            $q->select(\Illuminate\Support\Facades\DB::raw(1))
+              ->from('visits')
+              ->whereColumn('visits.location_id', 'schedules.location_id')
+              ->whereColumn('visits.user_id', 'schedules.user_id')
+              ->whereColumn('visits.tanggal', 'schedules.tanggal');
+        });
+
         return $query->with(['location', 'visitType'])->get();
     }
 

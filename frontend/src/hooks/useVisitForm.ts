@@ -78,6 +78,17 @@ export function useVisitForm(
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
+  // Time tracking
+  const [startTime] = useState<Date>(new Date());
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setElapsedSeconds(Math.floor((new Date().getTime() - startTime.getTime()) / 1000));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [startTime]);
+
   useEffect(() => {
     if (!scheduleId && (!locationId || !visitTypeId)) {
       setIsLoading(false);
@@ -123,6 +134,33 @@ export function useVisitForm(
     setFindings(prev => prev.filter(f => f.id !== id));
   };
 
+  // Validation Logic
+  const getValidationStatus = () => {
+    if (!template?.checklist_templates) return { isKondisiComplete: false, isVisualComplete: false, isFindingsValid: true, canSubmit: false };
+
+    const isKondisiComplete = template.checklist_templates
+      .filter(f => f.field_type !== 'file' && f.is_required)
+      .every(f => responses[f.id.toString()] !== undefined && responses[f.id.toString()] !== "");
+
+    const isVisualComplete = template.checklist_templates
+      .filter(f => f.field_type === 'file' && f.is_required)
+      .every(f => responses[f.id.toString()] instanceof File);
+
+    const isFindingsValid = findings.every(f => f.temuan !== "" && f.keterangan !== "");
+    
+    const isTimeReached = elapsedSeconds >= 300; // 5 minutes (300 seconds)
+
+    return {
+      isKondisiComplete,
+      isVisualComplete,
+      isFindingsValid,
+      isTimeReached,
+      canSubmit: isKondisiComplete && isVisualComplete && isFindingsValid && isTimeReached
+    };
+  };
+
+  const validation = getValidationStatus();
+
   const saveLocalLog = (payload: VisitLogPayload) => {
     try {
       const logsStr = localStorage.getItem('visit_logs') || '[]';
@@ -164,12 +202,17 @@ export function useVisitForm(
 
   const submitForm = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+    if (!validation.canSubmit) return;
+
     setIsSubmitting(true);
     setError("");
     
     try {
       const formData = new FormData();
       const currentKode = `V-${Date.now()}`;
+      const endTime = new Date();
+      const durationFormatted = `${Math.floor(elapsedSeconds / 60)} menit ${elapsedSeconds % 60} detik`;
+
       formData.append('kode_kunjungan', currentKode);
       formData.append('tanggal', new Date().toISOString().split('T')[0]);
       
@@ -180,6 +223,11 @@ export function useVisitForm(
       if (vtId) formData.append('visit_type_id', vtId.toString());
       
       formData.append('terjadwal', scheduleId ? 'terjadwal' : 'tidak terjadwal');
+      
+      // Work duration fields
+      formData.append('waktu_mulai', startTime.toISOString());
+      formData.append('waktu_selesai', endTime.toISOString());
+      formData.append('durasi', durationFormatted);
 
       const currentResponses = Object.entries(responses).map(([id, val]) => ({ 
         template_id: id, 
@@ -227,6 +275,8 @@ export function useVisitForm(
     isSubmitting,
     error,
     success,
+    elapsedSeconds,
+    validation,
     handleInputChange,
     addFinding,
     updateFinding,

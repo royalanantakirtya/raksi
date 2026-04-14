@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { 
   ChevronLeft, 
-  Clock, 
   MapPin, 
   Calendar, 
   CheckCircle2, 
@@ -103,7 +102,11 @@ export default function HistoryPage() {
               </div>
             ) : (
               serverVisits.map((visit) => (
-                <div key={visit.id} className="maroon-gradient p-5 rounded-3xl border border-white/10 shadow-xl space-y-4 relative overflow-hidden group">
+                <div 
+                  key={visit.id} 
+                  onClick={() => router.push(`/history/${visit.id}`)}
+                  className="maroon-gradient p-5 rounded-3xl border border-white/10 shadow-xl space-y-4 relative overflow-hidden group active:scale-[0.98] transition-all cursor-pointer"
+                >
                   <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rotate-45 translate-x-12 -translate-y-12" />
                   
                   <div className="flex items-center justify-between relative z-10">
@@ -127,12 +130,14 @@ export default function HistoryPage() {
 
                   <div className="grid grid-cols-2 gap-3 pt-2">
                     <div className="bg-white/5 p-3 rounded-2xl border border-white/5">
-                      <p className="text-[9px] text-white/30 uppercase font-black tracking-widest mb-1">Tipe</p>
-                      <p className="text-[10px] text-white font-bold uppercase">{visit.visit_type?.nama_tipe || "-"}</p>
+                      <p className="text-[9px] text-white/30 uppercase font-black tracking-widest mb-1">Status</p>
+                      <p className="text-[10px] text-white font-bold uppercase">
+                        {visit.responses?.length || 0} Param / {visit.findings?.length || 0} Temuan
+                      </p>
                     </div>
                     <div className="bg-white/5 p-3 rounded-2xl border border-white/5">
-                      <p className="text-[9px] text-white/30 uppercase font-black tracking-widest mb-1">Waktu</p>
-                      <p className="text-[10px] text-white font-bold uppercase">{visit.waktu_mulai} - {visit.waktu_selesai || "..."}</p>
+                      <p className="text-[9px] text-white/30 uppercase font-black tracking-widest mb-1">Durasi</p>
+                      <p className="text-[10px] text-white font-bold uppercase">{visit.durasi || "-"}</p>
                     </div>
                   </div>
                 </div>

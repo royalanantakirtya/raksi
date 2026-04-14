@@ -6,9 +6,10 @@ use App\Models\Visit;
 use App\Models\VisitResponse;
 use App\Repositories\VisitRepositoryInterface;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 
 /**
- * VisitService - Ver: 1.0.5 (Last Sync: 2026-04-10)
+ * VisitService - Ver: 1.0.6 (Last Sync: 2026-04-14)
  */
 class VisitService
 {
@@ -17,6 +18,10 @@ class VisitService
     public function store(array $data, int $userId): Visit
     {
         return DB::transaction(function () use ($data, $userId) {
+            // Format ISO Datetime from frontend to Database-friendly TIME (H:i:s)
+            $waktuMulai = isset($data['waktu_mulai']) ? Carbon::parse($data['waktu_mulai'])->toTimeString() : null;
+            $waktuSelesai = isset($data['waktu_selesai']) ? Carbon::parse($data['waktu_selesai'])->toTimeString() : null;
+
             $visit = $this->visitRepository->create([
                 'kode_kunjungan' => $data['kode_kunjungan'],
                 'tanggal'        => $data['tanggal'],
@@ -25,8 +30,8 @@ class VisitService
                 'id_mesin'       => $data['id_mesin'] ?? null,
                 'visit_type_id'  => $data['visit_type_id'],
                 'terjadwal'      => $data['terjadwal'],
-                'waktu_mulai'    => $data['waktu_mulai'] ?? null,
-                'waktu_selesai'  => $data['waktu_selesai'] ?? null,
+                'waktu_mulai'    => $waktuMulai,
+                'waktu_selesai'  => $waktuSelesai,
                 'durasi'         => $data['durasi'] ?? null,
             ]);
 

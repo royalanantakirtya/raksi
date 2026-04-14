@@ -14,6 +14,7 @@ import {
   Camera,
   Plus,
   Trash2,
+  Clock,
 } from "lucide-react";
 import { useVisitForm } from "@/hooks/useVisitForm";
 
@@ -41,6 +42,8 @@ function VisitCreateContent() {
     isSubmitting,
     error,
     success,
+    elapsedSeconds,
+    validation,
     handleInputChange,
     addFinding,
     updateFinding,
@@ -48,13 +51,19 @@ function VisitCreateContent() {
     submitForm,
   } = useVisitForm(scheduleId, locationId, visitTypeId);
 
-  const [openSections, setOpenSections] = useState<string[]>(["kondisi"]);
+  const [openSection, setOpenSection] = useState<string>("kondisi");
 
   const toggleSection = (section: string) => {
-    setOpenSections((prev) =>
-      prev.includes(section) ? prev.filter((s) => s !== section) : [...prev, section]
-    );
+    setOpenSection(prev => prev === section ? "" : section);
   };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const remainingSeconds = Math.max(0, 300 - elapsedSeconds);
 
   if (isLoading) {
     return (
@@ -124,8 +133,8 @@ function VisitCreateContent() {
                 Laporan kunjungan Anda telah diverifikasi dan disimpan di server.
               </p>
               <button 
-                 onClick={() => router.push('/')}
-                 className="mt-6 w-full py-4 bg-white text-primary rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg hover:bg-secondary transition-colors"
+                onClick={() => router.push('/')}
+                className="mt-6 w-full py-4 bg-white text-primary rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg hover:bg-secondary transition-colors"
               >
                 Kembali ke Beranda
               </button>
@@ -144,31 +153,35 @@ function VisitCreateContent() {
           <form onSubmit={submitForm} className="space-y-4">
             
             {/* 1. KONDISI LOKASI SECTION */}
-            <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm">
+            <div className={`overflow-hidden rounded-3xl border transition-all duration-300 ${validation.isKondisiComplete ? 'border-success/30 bg-success/5' : 'border-white/10 bg-white/5'} backdrop-blur-sm`}>
               <button 
                 type="button"
                 onClick={() => toggleSection('kondisi')}
                 className="w-full flex items-center justify-between p-6 text-left active:bg-white/5 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center">
-                    <ListChecks className="w-5 h-5 text-secondary" />
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${validation.isKondisiComplete ? 'bg-success/20' : 'bg-secondary/10'}`}>
+                    {validation.isKondisiComplete ? <CheckCircle2 className="w-5 h-5 text-success" /> : <ListChecks className="w-5 h-5 text-secondary" />}
                   </div>
                   <div>
-                    <h3 className="text-sm font-black text-white uppercase tracking-wider">Kondisi Lokasi</h3>
+                    <h3 className={`text-sm font-black uppercase tracking-wider ${validation.isKondisiComplete ? 'text-success' : 'text-white'}`}>Kondisi Lokasi</h3>
                     <p className="text-[10px] text-white/40 font-bold uppercase">{kondisiFields.length} Parameter</p>
                   </div>
                 </div>
-                <ChevronDown className={`w-5 h-5 text-white/30 transition-transform duration-300 ${openSections.includes('kondisi') ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-5 h-5 text-white/30 transition-transform duration-300 ${openSection === 'kondisi' ? 'rotate-180' : ''}`} />
               </button>
               
-              {openSections.includes('kondisi') && (
+              {openSection === 'kondisi' && (
                 <div className="p-6 pt-0 space-y-6 border-t border-white/5">
                   {kondisiFields.map((field: ChecklistField) => (
                     <div key={field.id} className="space-y-3">
                       <label className="text-xs font-bold text-white/60 uppercase tracking-widest flex justify-between">
                         {field.label}
-                        {field.is_required && <span className="text-secondary text-[10px]">*Wajib</span>}
+                        {field.is_required && (
+                          responses[field.id.toString()] ? 
+                          <span className="text-success text-[10px] flex items-center gap-1"><CheckCircle2 className="w-3 h-3"/> Terisi</span> : 
+                          <span className="text-secondary text-[10px]">*Wajib</span>
+                        )}
                       </label>
                       
                       {field.field_type === 'select' ? (
@@ -201,32 +214,32 @@ function VisitCreateContent() {
             </div>
 
             {/* 2. VISUAL LOKASI SECTION */}
-            <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm">
+            <div className={`overflow-hidden rounded-3xl border transition-all duration-300 ${validation.isVisualComplete ? 'border-success/30 bg-success/5' : 'border-white/10 bg-white/5'} backdrop-blur-sm`}>
               <button 
                 type="button"
                 onClick={() => toggleSection('visual')}
                 className="w-full flex items-center justify-between p-6 text-left"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
-                    <Camera className="w-5 h-5 text-accent" />
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${validation.isVisualComplete ? 'bg-success/20' : 'bg-accent/10'}`}>
+                    {validation.isVisualComplete ? <CheckCircle2 className="w-5 h-5 text-success" /> : <Camera className="w-5 h-5 text-accent" />}
                   </div>
                   <div>
-                    <h3 className="text-sm font-black text-white uppercase tracking-wider">Visual Lokasi</h3>
+                    <h3 className={`text-sm font-black uppercase tracking-wider ${validation.isVisualComplete ? 'text-success' : 'text-white'}`}>Visual Lokasi</h3>
                     <p className="text-[10px] text-white/40 font-bold uppercase">{visualFields.length} Foto Wajib</p>
                   </div>
                 </div>
-                <ChevronDown className={`w-5 h-5 text-white/30 transition-transform duration-300 ${openSections.includes('visual') ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-5 h-5 text-white/30 transition-transform duration-300 ${openSection === 'visual' ? 'rotate-180' : ''}`} />
               </button>
 
-              {openSections.includes('visual') && (
+              {openSection === 'visual' && (
                 <div className="p-6 pt-0 grid grid-cols-1 gap-4 border-t border-white/5">
                   {visualFields.map((field: ChecklistField) => (
                     <div key={field.id} className="relative group">
                       <input 
                         type="file" 
                         accept="image/*" 
-                        capture="camera"
+                        capture="environment"
                         className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer"
                         onChange={(e) => {
                           if (e.target.files?.[0]) handleInputChange(field.id.toString(), e.target.files[0]);
@@ -255,27 +268,27 @@ function VisitCreateContent() {
             </div>
 
             {/* 3. TEMUAN SECTION */}
-            <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm">
+            <div className={`overflow-hidden rounded-3xl border transition-all duration-300 ${findings.length > 0 && validation.isFindingsValid ? 'border-success/30 bg-success/5' : 'border-white/10 bg-white/5'} backdrop-blur-sm`}>
               <button 
                 type="button"
                 onClick={() => toggleSection('temuan')}
                 className="w-full flex items-center justify-between p-6 text-left"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-danger/10 flex items-center justify-center">
-                    <AlertCircle className="w-5 h-5 text-danger" />
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${findings.length > 0 && validation.isFindingsValid ? 'bg-success/20' : 'bg-danger/10'}`}>
+                    {findings.length > 0 && validation.isFindingsValid ? <CheckCircle2 className="w-5 h-5 text-success" /> : <AlertCircle className="w-5 h-5 text-danger" />}
                   </div>
                   <div>
-                    <h3 className="text-sm font-black text-white uppercase tracking-wider">Temuan Permasalahan</h3>
-                    <p className="text-[10px] text-white/40 font-bold uppercase">{findings.length} Kasus Ditemukan</p>
+                    <h3 className={`text-sm font-black uppercase tracking-wider ${findings.length > 0 && validation.isFindingsValid ? 'text-success' : 'text-white'}`}>Temuan Permasalahan</h3>
+                    <p className="text-[10px] text-white/40 font-bold uppercase">{findings.length} Kasus Ditemukan (Opsional)</p>
                   </div>
                 </div>
-                <ChevronDown className={`w-5 h-5 text-white/30 transition-transform duration-300 ${openSections.includes('temuan') ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-5 h-5 text-white/30 transition-transform duration-300 ${openSection === 'temuan' ? 'rotate-180' : ''}`} />
               </button>
 
-              {openSections.includes('temuan') && (
+              {openSection === 'temuan' && (
                 <div className="p-6 pt-0 space-y-4 border-t border-white/5">
-                  {findings.map((finding: ChecklistFinding) => (
+                  {findings.map((finding) => (
                     <div key={finding.id} className="maroon-gradient rounded-2xl p-4 border border-white/10 relative space-y-4">
                       <button 
                         type="button" 
@@ -306,7 +319,7 @@ function VisitCreateContent() {
                           <input 
                             type="file" 
                             accept="image/*" 
-                            capture="camera"
+                            capture="environment"
                             className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer"
                             onChange={(e) => {
                               if (e.target.files?.[0]) updateFinding(finding.id, { foto_temuan: e.target.files[0] });
@@ -344,22 +357,46 @@ function VisitCreateContent() {
               )}
             </div>
 
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className={`w-full py-6 rounded-3xl maroon-gradient text-white font-black text-sm uppercase tracking-[0.3em] shadow-[0_20px_50px_rgba(150,0,0,0.3)] flex items-center justify-center gap-3 active:scale-[0.98] transition-all mt-10 ${
-                isSubmitting ? "opacity-70 cursor-not-allowed" : ""
-              }`}
-            >
-              {isSubmitting ? (
-                <Loader2 className="w-6 h-6 animate-spin" />
-              ) : (
-                <>
-                  <Save className="w-5 h-5 shadow-lg" />
-                  Kirim Laporan Akhir
-                </>
-              )}
-            </button>
+            {/* Submission Logic Display */}
+            <div className="pt-6 space-y-4">
+               {!validation.isTimeReached && (
+                 <div className="p-4 rounded-2xl bg-secondary/5 border border-secondary/20 flex items-center gap-3">
+                   <Clock className="w-4 h-4 text-secondary animate-pulse" />
+                   <p className="text-[10px] font-bold text-white/60 uppercase tracking-widest">
+                     Laporan dapat dikirim dalam <span className="text-secondary">{formatTime(remainingSeconds)}</span>
+                   </p>
+                 </div>
+               )}
+
+               {!validation.canSubmit && validation.isTimeReached && (
+                 <div className="p-4 rounded-2xl bg-danger/5 border border-danger/20 flex items-center gap-3">
+                   <AlertCircle className="w-4 h-4 text-danger" />
+                   <p className="text-[10px] font-bold text-white/60 uppercase tracking-widest leading-relaxed">
+                     Lengkapi semua parameter wajib (Kondisi & Visual) sebelum mengirim laporan.
+                   </p>
+                 </div>
+               )}
+
+              <button
+                type="submit"
+                disabled={isSubmitting || !validation.canSubmit}
+                className={`w-full py-6 rounded-3xl text-white font-black text-sm uppercase tracking-[0.3em] shadow-[0_20px_50px_rgba(150,0,0,0.3)] flex items-center justify-center gap-3 active:scale-[0.98] transition-all ${
+                  isSubmitting || !validation.canSubmit 
+                    ? "bg-zinc-800 text-white/20 cursor-not-allowed shadow-none border border-white/5" 
+                    : "maroon-gradient shadow-[0_20px_50px_rgba(150,0,0,0.3)]"
+                }`}
+              >
+                {isSubmitting ? (
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                ) : (
+                  <>
+                    {!validation.canSubmit && <Clock className="w-5 h-5" />}
+                    {validation.canSubmit && <Save className="w-5 h-5 shadow-lg" />}
+                    {validation.isTimeReached ? 'Kirim Laporan Akhir' : `Tunggu (${formatTime(remainingSeconds)})`}
+                  </>
+                )}
+              </button>
+            </div>
           </form>
         )}
       </div>

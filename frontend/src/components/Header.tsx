@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { usePathname } from 'next/navigation';
 import { LogOut, User as UserIcon } from 'lucide-react';
 
 export default function Header() {
-  const [userName, setUserName] = useState(() => {
+  const [userName] = useState(() => {
     if (typeof window !== 'undefined') {
       const userData = localStorage.getItem('user');
       if (userData && userData !== 'undefined') {
