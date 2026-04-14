@@ -1,6 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Header from "@/components/Header";
+import BottomNav from "@/components/BottomNav";
+import AuthGuard from "@/components/AuthGuard";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,14 +28,9 @@ export const metadata: Metadata = {
   },
 };
 
-import { Viewport } from "next";
-
 export const viewport: Viewport = {
   themeColor: "#111827",
 };
-
-import Header from "@/components/Header";
-import BottomNav from "@/components/BottomNav";
 
 export default function RootLayout({
   children,
@@ -45,11 +43,13 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)]">
-        <Header />
-        <main className="flex-1 pb-24 pt-20 px-4 max-w-lg mx-auto w-full">
-          {children}
-        </main>
-        <BottomNav />
+        <AuthGuard>
+          <Header />
+          <main className="flex-1 pb-24 pt-20 px-4 max-w-lg mx-auto w-full">
+            {children}
+          </main>
+          <BottomNav />
+        </AuthGuard>
       </body>
     </html>
   );

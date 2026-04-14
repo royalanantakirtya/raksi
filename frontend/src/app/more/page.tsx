@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { 
   User, 
@@ -26,12 +26,12 @@ export default function MorePage() {
   const router = useRouter();
   
   // Lazy initialization to prevent cascading renders
-  const [user, setUser] = useState<UserSession | null>(() => {
+  const [user] = useState<UserSession | null>(() => {
     if (typeof window === "undefined") return null;
     try {
       const userData = localStorage.getItem("user");
       return userData ? JSON.parse(userData) : null;
-    } catch (e) {
+    } catch {
       return null;
     }
   });

@@ -31,14 +31,11 @@ export function useDashboardStats() {
         newsService.getAll(),
       ]);
 
-      const schedules = Array.isArray(schedulesData.data) ? schedulesData.data : 
-                        Array.isArray(schedulesData) ? schedulesData : [];
+      const schedules = (schedulesData as { data?: unknown[] })?.data ?? (Array.isArray(schedulesData) ? schedulesData : []);
       
-      const requests = Array.isArray(requestsData.data) ? requestsData.data : 
-                       Array.isArray(requestsData) ? requestsData : [];
+      const requests = (requestsData as { data?: unknown[] })?.data ?? (Array.isArray(requestsData) ? requestsData : []);
       
-      const newsItems = Array.isArray(newsRaw.data) ? newsRaw.data : 
-                        Array.isArray(newsRaw) ? newsRaw : [];
+      const newsItems = (newsRaw as { data?: unknown[] })?.data ?? (Array.isArray(newsRaw) ? newsRaw : []);
 
       setStats({
         total: schedules.length,
@@ -48,7 +45,7 @@ export function useDashboardStats() {
       });
 
       setApprovedRequests(
-        requests.filter((r: VisitRequest) => r.status === "approved"),
+        (requests as VisitRequest[]).filter((r) => r.status === "approved"),
       );
       setNews(newsItems);
     } catch (error) {

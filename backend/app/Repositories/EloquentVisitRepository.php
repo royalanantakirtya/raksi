@@ -20,6 +20,6 @@ class EloquentVisitRepository implements VisitRepositoryInterface
 
     public function getAll(): Collection
     {
-        return Visit::with(['user', 'location', 'visitType'])->latest()->get();
+        return Visit::with(['user', 'location', 'visitType', 'responses', 'findings'])->latest()->get();
     }
 }

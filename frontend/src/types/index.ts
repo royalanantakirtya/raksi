@@ -75,8 +75,21 @@ export interface VisitRequest {
 }
 
 export interface VisitResponse {
-  template_id: string | number;
+  id?: number;
+  visit_id?: number;
+  template_id: number;
+  template?: ChecklistTemplate;
   value: string;
+}
+
+export interface Finding {
+  id: number;
+  nomor_tiket: string;
+  visit_id: number;
+  tanggal: string;
+  temuan: string;
+  foto_temuan?: string;
+  status: 'open' | 'closed';
 }
 
 export interface Visit {
@@ -93,9 +106,11 @@ export interface Visit {
   terjadwal: 'terjadwal' | 'tidak terjadwal';
   waktu_mulai: string;
   waktu_selesai?: string;
+  durasi?: string;
   created_at?: string;
   updated_at?: string;
   responses?: VisitResponse[];
+  findings?: Finding[];
 }
 
 export interface NewsItem {

@@ -14,7 +14,7 @@ import {
   Play
 } from "lucide-react";
 import api from "@/lib/api";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Schedule } from "@/types";
 
@@ -42,13 +42,14 @@ export default function ScheduleDetailPage() {
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
   const [distance, setDistance] = useState<number | null>(null);
   const [isLocating, setIsLocating] = useState(false);
-  const [error, setError] = useState("");
+  const [, setError] = useState("");
 
   const GEOFENCE_RADIUS = 250; // meters
 
   useEffect(() => {
     fetchSchedule();
     watchLocation();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id]);
 
   const fetchSchedule = async () => {
