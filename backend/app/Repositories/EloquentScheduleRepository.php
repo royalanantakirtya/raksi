@@ -22,14 +22,12 @@ class EloquentScheduleRepository implements ScheduleRepositoryInterface
             $query->where('tanggal', Carbon::today()->toDateString());
         }
 
-        // Filter out schedules that already have a visit record
-        $query->whereNotExists(function ($q) {
-            $q->select(\Illuminate\Support\Facades\DB::raw(1))
-              ->from('visits')
-              ->whereColumn('visits.location_id', 'schedules.location_id')
-              ->whereColumn('visits.user_id', 'schedules.user_id')
-              ->whereColumn('visits.tanggal', 'schedules.tanggal');
-        });
+        // Filter schedules by status if provided, otherwise default to 'open'
+        if (isset($filters['status'])) {
+            $query->where('status', $filters['status']);
+        } else {
+            $query->where('status', 'open');
+        }
 
         return $query->with(['location', 'visitType'])->get();
     }

@@ -29,7 +29,9 @@ export default function LocationsPage() {
     setIsLoading(true);
     try {
       const response = await api.get('/locations');
-      setLocations(response.data);
+      const rawData = response?.data;
+      const locationsArray = rawData?.data || rawData || [];
+      setLocations(Array.isArray(locationsArray) ? locationsArray : []);
     } catch (err) {
       console.error("Error fetching locations:", err);
       setError("Gagal mengambil daftar lokasi.");

@@ -78,6 +78,13 @@ class VisitService
                 }
             }
 
+            // Update Schedule Status if exists
+            \App\Models\Schedule::where('location_id', $data['location_id'])
+                ->where('user_id', $userId)
+                ->where('tanggal', $data['tanggal'])
+                ->where('status', 'open')
+                ->update(['status' => 'closed']);
+
             return $visit->load(['responses', 'findings']);
         });
     }

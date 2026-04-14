@@ -6,7 +6,6 @@ import {
   Loader2, 
   MapPin, 
   Navigation, 
-  Clock, 
   CheckCircle2, 
   AlertTriangle,
   ChevronLeft,
@@ -138,9 +137,10 @@ export default function ScheduleDetailPage() {
       <div className="flex items-center justify-between">
         <button 
           onClick={() => router.back()}
-          className="p-2 rounded-xl bg-white/5 border border-white/5 text-white/70 active:scale-90 transition-all"
+          className="p-2 rounded-xl bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/5 text-zinc-600 dark:text-white/70 active:scale-90 transition-all flex items-center gap-2"
         >
           <ChevronLeft className="w-5 h-5" />
+          <span className="text-[10px] font-black uppercase">Kembali</span>
         </button>
         <span className="text-[10px] uppercase font-black bg-secondary/10 text-secondary px-3 py-1 rounded-full tracking-wider border border-secondary/10">
           ID: {schedule?.location?.kode_lokasi || '...'}
@@ -154,8 +154,8 @@ export default function ScheduleDetailPage() {
       >
         {/* Header Summary */}
         <section className="space-y-2">
-          <h2 className="text-2xl font-bold tracking-tight text-white uppercase">{schedule?.location?.lokasi || 'Lokasi'}</h2>
-          <div className="flex items-center gap-2 text-accent text-xs font-semibold uppercase tracking-wider">
+          <h2 className="text-2xl font-bold tracking-tight text-zinc-800 dark:text-white uppercase">{schedule?.location?.lokasi || 'Lokasi'}</h2>
+          <div className="flex items-center gap-2 text-zinc-500 dark:text-accent text-xs font-semibold uppercase tracking-wider">
             <Info className="w-3.5 h-3.5 text-secondary" />
             <span>Tipe: {schedule?.visit_type?.nama_tipe || 'Kunjungan'}</span>
           </div>
@@ -170,7 +170,7 @@ export default function ScheduleDetailPage() {
               </div>
               <div className="space-y-1">
                 <p className="text-[10px] text-white/40 uppercase font-black tracking-widest">Alamat Lengkap</p>
-                <p className="text-sm font-medium leading-relaxed">{schedule?.location?.alamat || '-'}</p>
+                <p className="text-sm font-medium leading-relaxed text-white">{schedule?.location?.alamat || '-'}</p>
               </div>
             </div>
 
@@ -180,7 +180,7 @@ export default function ScheduleDetailPage() {
               </div>
               <div className="space-y-1 flex-1">
                 <p className="text-[10px] text-white/40 uppercase font-black tracking-widest">Koordinat Lokasi</p>
-                <p className="text-xs font-mono text-accent">
+                <p className="text-xs font-mono text-white/70">
                   {schedule?.location?.latitude || '0'}, {schedule?.location?.longitude || '0'}
                 </p>
               </div>
@@ -226,7 +226,7 @@ export default function ScheduleDetailPage() {
                   <CheckCircle2 className={cn("w-5 h-5", isWithinRadius ? "text-white" : "text-white/20")} />
                 </div>
                 <div>
-                  <p className="text-xs font-bold">Jarak Anda</p>
+                  <p className="text-xs font-bold text-white">Jarak Anda</p>
                   <p className="text-lg font-black gold-text">
                     {distance !== null ? `${Math.round(distance)} Meter` : '...'}
                   </p>
@@ -237,7 +237,7 @@ export default function ScheduleDetailPage() {
               )}
             </div>
             
-            <p className="text-[10px] text-accent italic px-2">
+            <p className="text-[10px] text-zinc-500 dark:text-accent italic px-2">
               * Tombol laporan akan aktif otomatis jika Anda berada dalam radius {GEOFENCE_RADIUS} meter dari lokasi target.
             </p>
           </div>

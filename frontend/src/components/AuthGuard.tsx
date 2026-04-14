@@ -24,16 +24,17 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const user = getStoredUser();
-    // Reading localStorage is a one-time init per pathname change — not a subscription.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setStatus(user ? "auth" : "unauth");
-  }, [pathname]);
-
-  useEffect(() => {
-    if (status === "unauth" && pathname !== "/login") {
-      router.replace("/login");
+    
+    if (user) {
+      setStatus("auth");
+    } else {
+      setStatus("unauth");
+      // If no user and not on login page, redirect immediately
+      if (pathname !== "/login") {
+        router.replace("/login");
+      }
     }
-  }, [status, pathname, router]);
+  }, [pathname, router]);
 
   // SSR + initial client render: show spinner (no hydration mismatch)
   if (status === "loading") {

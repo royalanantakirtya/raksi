@@ -14,12 +14,12 @@ class EloquentVisitRepository implements VisitRepositoryInterface
 
     public function findById(int $id): Visit
     {
-        return Visit::with(['user', 'location', 'visitType', 'responses', 'findings'])
+        return Visit::with(['user', 'location', 'visitType', 'responses.template', 'findings'])
             ->findOrFail($id);
     }
 
     public function getAll(): Collection
     {
-        return Visit::with(['user', 'location', 'visitType', 'responses', 'findings'])->latest()->get();
+        return Visit::with(['user', 'location', 'visitType', 'responses.template', 'findings'])->latest()->get();
     }
 }

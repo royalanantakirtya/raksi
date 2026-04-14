@@ -1,8 +1,9 @@
 import api from "../lib/api";
 
 const scheduleService = {
-  getToday: async () => {
-    const response = await api.get("/schedules");
+  getToday: async (status?: string) => {
+    const url = status ? `/schedules?status=${status}` : "/schedules";
+    const response = await api.get(url);
     return response.data;
   },
 

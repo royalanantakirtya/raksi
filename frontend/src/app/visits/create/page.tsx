@@ -94,7 +94,7 @@ function VisitCreateContent() {
       <div className="flex items-center justify-between">
         <button
           onClick={() => router.back()}
-          className="p-2 rounded-xl bg-white/5 border border-white/10 text-white/70 active:scale-95 transition-all text-xs flex items-center gap-2"
+          className="p-2 rounded-xl bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-white/70 active:scale-95 transition-all text-xs flex items-center gap-2"
         >
           <ChevronLeft className="w-4 h-4" /> Batal
         </button>
@@ -112,10 +112,10 @@ function VisitCreateContent() {
             <ListChecks className="w-4 h-4 text-secondary" />
             <span>Laporan Kunjungan</span>
           </div>
-          <h2 className="text-2xl font-black tracking-tight text-white uppercase leading-tight">
+          <h2 className="text-2xl font-black tracking-tight text-zinc-900 dark:text-white uppercase leading-tight">
             {schedule.location?.lokasi || "Lokasi"}
           </h2>
-          <div className="flex items-center gap-2 text-white/40 text-[10px] font-bold uppercase tracking-wider bg-white/5 w-fit px-3 py-1 rounded-full">
+          <div className="flex items-center gap-2 text-zinc-500 dark:text-white/40 text-[10px] font-bold uppercase tracking-wider bg-zinc-100 dark:bg-white/5 w-fit px-3 py-1 rounded-full border border-zinc-200 dark:border-white/10">
             <Info className="w-3 h-3" />
             <span>{template.nama_tipe}</span>
           </div>
@@ -152,37 +152,26 @@ function VisitCreateContent() {
         {!success && (
           <form onSubmit={submitForm} className="space-y-4">
             
-            {/* 1. KONDISI LOKASI SECTION */}
-            <div className={`overflow-hidden rounded-3xl border transition-all duration-300 ${validation.isKondisiComplete ? 'border-success/30 bg-success/5' : 'border-white/10 bg-white/5'} backdrop-blur-sm`}>
+            {/* Section: Kondisi Lokasi */}
+            <section className="space-y-4">
               <button 
                 type="button"
                 onClick={() => toggleSection('kondisi')}
-                className="w-full flex items-center justify-between p-6 text-left active:bg-white/5 transition-colors"
+                className="w-full flex items-center justify-between p-2 group"
               >
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${validation.isKondisiComplete ? 'bg-success/20' : 'bg-secondary/10'}`}>
-                    {validation.isKondisiComplete ? <CheckCircle2 className="w-5 h-5 text-success" /> : <ListChecks className="w-5 h-5 text-secondary" />}
-                  </div>
-                  <div>
-                    <h3 className={`text-sm font-black uppercase tracking-wider ${validation.isKondisiComplete ? 'text-success' : 'text-white'}`}>Kondisi Lokasi</h3>
-                    <p className="text-[10px] text-white/40 font-bold uppercase">{kondisiFields.length} Parameter</p>
-                  </div>
-                </div>
-                <ChevronDown className={`w-5 h-5 text-white/30 transition-transform duration-300 ${openSection === 'kondisi' ? 'rotate-180' : ''}`} />
+                <h3 className="text-xs font-black text-zinc-800 dark:text-white/40 uppercase tracking-widest flex items-center gap-2 group-hover:text-secondary transition-colors">
+                  <ListChecks className="w-4 h-4 text-secondary" /> 01. Kondisi Lokasi
+                </h3>
+                <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform duration-300 ${openSection === 'kondisi' ? 'rotate-180' : ''}`} />
               </button>
               
               {openSection === 'kondisi' && (
-                <div className="p-6 pt-0 space-y-6 border-t border-white/5">
+                <div className="space-y-3 animate-fade-in">
                   {kondisiFields.map((field: ChecklistField) => (
-                    <div key={field.id} className="space-y-3">
-                      <label className="text-xs font-bold text-white/60 uppercase tracking-widest flex justify-between">
-                        {field.label}
-                        {field.is_required && (
-                          responses[field.id.toString()] ? 
-                          <span className="text-success text-[10px] flex items-center gap-1"><CheckCircle2 className="w-3 h-3"/> Terisi</span> : 
-                          <span className="text-secondary text-[10px]">*Wajib</span>
-                        )}
-                      </label>
+                    <div key={field.id} className="bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/5 p-4 rounded-3xl space-y-3">
+                      <p className="text-[10px] font-black text-zinc-800 dark:text-white/70 uppercase leading-snug">
+                        {field.label} {field.is_required && <span className="text-danger">*</span>}
+                      </p>
                       
                       {field.field_type === 'select' ? (
                         <div className="relative">
@@ -190,12 +179,12 @@ function VisitCreateContent() {
                             required={field.is_required}
                             value={responses[field.id.toString()] as string || ""}
                             onChange={(e) => handleInputChange(field.id.toString(), e.target.value)}
-                            className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-sm text-white focus:outline-none focus:border-secondary/30 transition-all appearance-none"
+                            className="w-full bg-white dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-2xl py-3 px-4 text-xs text-zinc-800 dark:text-white focus:outline-none"
                           >
-                            <option value="" className="bg-zinc-900">-- Pilih Opsi --</option>
-                            {field.options?.map(opt => <option key={opt} value={opt} className="bg-zinc-900">{opt}</option>)}
+                            <option value="" className="bg-zinc-100 dark:bg-zinc-900">-- Pilih Opsi --</option>
+                            {field.options?.map(opt => <option key={opt} value={opt} className="bg-zinc-100 dark:bg-zinc-900">{opt}</option>)}
                           </select>
-                          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 pointer-events-none" />
+                          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
                         </div>
                       ) : (
                         <input
@@ -204,165 +193,168 @@ function VisitCreateContent() {
                           placeholder={`Isi ${field.label.toLowerCase()}...`}
                           value={responses[field.id.toString()] as string || ""}
                           onChange={(e) => handleInputChange(field.id.toString(), e.target.value)}
-                          className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-sm text-white focus:outline-none focus:border-secondary/30 transition-all placeholder:text-white/20"
+                          className="w-full bg-white dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-2xl py-3 px-4 text-xs text-zinc-800 dark:text-white focus:outline-none placeholder:text-zinc-400 dark:placeholder:text-white/10"
                         />
                       )}
                     </div>
                   ))}
                 </div>
               )}
-            </div>
+            </section>
 
-            {/* 2. VISUAL LOKASI SECTION */}
-            <div className={`overflow-hidden rounded-3xl border transition-all duration-300 ${validation.isVisualComplete ? 'border-success/30 bg-success/5' : 'border-white/10 bg-white/5'} backdrop-blur-sm`}>
+            {/* Section: Bukti Visual */}
+            <section className="space-y-4">
               <button 
                 type="button"
                 onClick={() => toggleSection('visual')}
-                className="w-full flex items-center justify-between p-6 text-left"
+                className="w-full flex items-center justify-between p-2 group"
               >
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${validation.isVisualComplete ? 'bg-success/20' : 'bg-accent/10'}`}>
-                    {validation.isVisualComplete ? <CheckCircle2 className="w-5 h-5 text-success" /> : <Camera className="w-5 h-5 text-accent" />}
-                  </div>
-                  <div>
-                    <h3 className={`text-sm font-black uppercase tracking-wider ${validation.isVisualComplete ? 'text-success' : 'text-white'}`}>Visual Lokasi</h3>
-                    <p className="text-[10px] text-white/40 font-bold uppercase">{visualFields.length} Foto Wajib</p>
-                  </div>
-                </div>
-                <ChevronDown className={`w-5 h-5 text-white/30 transition-transform duration-300 ${openSection === 'visual' ? 'rotate-180' : ''}`} />
+                <h3 className="text-xs font-black text-zinc-800 dark:text-white/40 uppercase tracking-widest flex items-center gap-2 group-hover:text-secondary transition-colors">
+                  <Camera className="w-4 h-4 text-secondary" /> 02. Bukti Visual (Foto)
+                </h3>
+                <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform duration-300 ${openSection === 'visual' ? 'rotate-180' : ''}`} />
               </button>
 
               {openSection === 'visual' && (
-                <div className="p-6 pt-0 grid grid-cols-1 gap-4 border-t border-white/5">
+                <div className="grid grid-cols-1 gap-3 animate-fade-in">
                   {visualFields.map((field: ChecklistField) => (
-                    <div key={field.id} className="relative group">
-                      <input 
-                        type="file" 
-                        accept="image/*" 
-                        capture="environment"
-                        className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer"
-                        onChange={(e) => {
-                          if (e.target.files?.[0]) handleInputChange(field.id.toString(), e.target.files[0]);
-                        }}
-                      />
-                      <div className={`p-4 rounded-2xl border-2 border-dashed transition-all flex items-center justify-between ${
-                        responses[field.id.toString()] ? 'bg-success/5 border-success/30' : 'bg-white/5 border-white/10 group-hover:border-accent/40'
-                      }`}>
-                        <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${responses[field.id.toString()] ? 'bg-success/20' : 'bg-white/5'}`}>
-                            {responses[field.id.toString()] ? <CheckCircle2 className="w-5 h-5 text-success" /> : <Camera className="w-5 h-5 text-white/20" />}
-                          </div>
-                          <div>
-                            <p className="text-xs font-bold text-white uppercase tracking-wider">{field.label}</p>
-                            <p className="text-[10px] text-white/40 uppercase font-black uppercase tracking-tighter">
-                              {responses[field.id.toString()] ? (responses[field.id.toString()] as File).name : 'Ambil Foto'}
-                            </p>
-                          </div>
+                    <div key={field.id} className="bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/5 p-4 rounded-3xl space-y-4">
+                      <p className="text-[10px] font-black text-zinc-800 dark:text-white/70 uppercase tracking-tight">
+                        {field.label} {field.is_required && <span className="text-danger">*</span>}
+                      </p>
+                      
+                      <div className="relative group">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          capture="environment"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleInputChange(field.id.toString(), file);
+                          }}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        />
+                        <div className={`w-full py-8 border-2 border-dashed rounded-[2rem] flex flex-col items-center justify-center gap-2 transition-all ${
+                          responses[field.id.toString()] instanceof File
+                            ? "bg-success/5 border-success/30 text-success"
+                            : "bg-white dark:bg-white/5 border-zinc-300 dark:border-white/10 text-zinc-400 dark:text-white/20 group-hover:border-secondary/40"
+                        }`}>
+                          {responses[field.id.toString()] instanceof File ? (
+                            <>
+                              <CheckCircle2 className="w-8 h-8" />
+                              <p className="text-[9px] font-black uppercase tracking-widest">Foto Tersimpan</p>
+                            </>
+                          ) : (
+                            <>
+                              <Camera className="w-8 h-8 mb-1" />
+                              <p className="text-[9px] font-black uppercase tracking-widest">Ambil Gambar</p>
+                              <p className="text-[8px] font-medium opacity-50 italic">Klik untuk membuka kamera</p>
+                            </>
+                          )}
                         </div>
-                        <Plus className="w-4 h-4 text-white/20" />
                       </div>
                     </div>
                   ))}
                 </div>
               )}
-            </div>
+            </section>
 
-            {/* 3. TEMUAN SECTION */}
-            <div className={`overflow-hidden rounded-3xl border transition-all duration-300 ${findings.length > 0 && validation.isFindingsValid ? 'border-success/30 bg-success/5' : 'border-white/10 bg-white/5'} backdrop-blur-sm`}>
-              <button 
-                type="button"
-                onClick={() => toggleSection('temuan')}
-                className="w-full flex items-center justify-between p-6 text-left"
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${findings.length > 0 && validation.isFindingsValid ? 'bg-success/20' : 'bg-danger/10'}`}>
-                    {findings.length > 0 && validation.isFindingsValid ? <CheckCircle2 className="w-5 h-5 text-success" /> : <AlertCircle className="w-5 h-5 text-danger" />}
-                  </div>
-                  <div>
-                    <h3 className={`text-sm font-black uppercase tracking-wider ${findings.length > 0 && validation.isFindingsValid ? 'text-success' : 'text-white'}`}>Temuan Permasalahan</h3>
-                    <p className="text-[10px] text-white/40 font-bold uppercase">{findings.length} Kasus Ditemukan (Opsional)</p>
-                  </div>
-                </div>
-                <ChevronDown className={`w-5 h-5 text-white/30 transition-transform duration-300 ${openSection === 'temuan' ? 'rotate-180' : ''}`} />
-              </button>
+            {/* Section: Temuan Lapangan */}
+            <section className="space-y-4">
+              <div className="flex items-center justify-between px-2">
+                <h3 className="text-xs font-black text-zinc-800 dark:text-white/40 uppercase tracking-widest flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-accent" /> 03. Temuan Lapangan
+                </h3>
+                <button 
+                  type="button"
+                  onClick={addFinding}
+                  className="flex items-center gap-1.5 px-4 py-1.5 bg-accent/10 text-accent rounded-full border border-accent/20 hover:bg-accent/20 transition-all text-[9px] font-black uppercase"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Tambah Temuan
+                </button>
+              </div>
 
-              {openSection === 'temuan' && (
-                <div className="p-6 pt-0 space-y-4 border-t border-white/5">
-                  {findings.map((finding) => (
-                    <div key={finding.id} className="maroon-gradient rounded-2xl p-4 border border-white/10 relative space-y-4">
-                      <button 
-                        type="button" 
-                        onClick={() => removeFinding(finding.id)}
-                        className="absolute top-4 right-4 text-white/30 hover:text-white"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                      
-                      <div className="space-y-3">
-                        <label className="text-[10px] font-black uppercase text-secondary tracking-[0.1em]">Jenis Temuan</label>
-                        <select 
-                          value={finding.temuan}
-                          onChange={(e) => updateFinding(finding.id, { temuan: e.target.value })}
-                          className="w-full bg-white/10 border border-white/10 rounded-xl py-3 px-4 text-xs text-white"
-                        >
-                          <option value="" className="bg-zinc-800">-- Pilih Temuan --</option>
-                          <option value="Kebersihan" className="bg-zinc-800">Kebersihan</option>
-                          <option value="Kerusakan Fisik" className="bg-zinc-800">Kerusakan Fisik</option>
-                          <option value="Kelistrikan" className="bg-zinc-800">Kelistrikan</option>
-                          <option value="Lainnya" className="bg-zinc-800">Lainnya</option>
-                        </select>
-                      </div>
+              <div className="space-y-4">
+                {findings.map((finding, index) => (
+                  <div key={index} className="bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/5 rounded-[2.5rem] p-5 space-y-4 animate-fade-in relative group/card">
+                    <button 
+                      type="button"
+                      onClick={() => removeFinding(finding.id)}
+                      className="absolute top-4 right-4 p-2 bg-danger/10 text-danger rounded-xl hover:bg-danger/20 transition-all opacity-0 group-hover/card:opacity-100"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
 
-                      <div className="space-y-3">
-                        <label className="text-[10px] font-black uppercase text-secondary tracking-[0.1em]">Foto Temuan</label>
-                        <div className="relative">
-                          <input 
-                            type="file" 
-                            accept="image/*" 
-                            capture="environment"
-                            className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer"
-                            onChange={(e) => {
-                              if (e.target.files?.[0]) updateFinding(finding.id, { foto_temuan: e.target.files[0] });
-                            }}
-                          />
-                          <div className={`py-4 px-5 rounded-xl border border-dashed flex items-center gap-3 ${finding.foto_temuan ? 'bg-success/10 border-success/30' : 'bg-white/5 border-white/10'}`}>
-                            <Camera className="w-4 h-4 text-white/20" />
-                            <span className="text-[10px] text-white/50 uppercase font-black truncate max-w-[150px]">
-                              {finding.foto_temuan ? finding.foto_temuan.name : 'Upload Foto'}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="space-y-3">
-                        <label className="text-[10px] font-black uppercase text-secondary tracking-[0.1em]">Catatan / Keterangan</label>
-                        <textarea 
-                          placeholder="Jelaskan temuan secara rinci..."
+                    <div className="space-y-4">
+                      <div className="space-y-2 px-1">
+                        <label className="text-[9px] font-black text-zinc-500 dark:text-white/30 uppercase tracking-widest">Deskripsi Temuan</label>
+                        <textarea
                           value={finding.keterangan}
                           onChange={(e) => updateFinding(finding.id, { keterangan: e.target.value })}
-                          className="w-full bg-white/10 border border-white/10 rounded-xl py-3 px-4 text-xs text-white h-20"
+                          placeholder="Jelaskan kondisi atau masalah yang ditemukan di lapangan..."
+                          className="w-full bg-white dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-2xl p-4 text-xs text-zinc-800 dark:text-white focus:outline-none focus:border-secondary/30 transition-all min-h-[100px] placeholder:text-zinc-400 dark:placeholder:text-white/10"
                         />
                       </div>
-                    </div>
-                  ))}
 
-                  <button 
-                    type="button"
-                    onClick={addFinding}
-                    className="w-full py-4 border-2 border-dashed border-white/10 rounded-2xl flex items-center justify-center gap-2 text-white/40 hover:text-white transition-all text-xs font-black uppercase tracking-widest"
-                  >
-                    <Plus className="w-4 h-4" /> Tambah Temuan Baru
-                  </button>
-                </div>
-              )}
-            </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2 px-1">
+                          <label className="text-[9px] font-black text-zinc-500 dark:text-white/30 uppercase tracking-widest">Kategori</label>
+                          <div className="relative">
+                            <select 
+                              className="w-full appearance-none bg-white dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-2xl px-4 py-3 text-xs text-zinc-800 dark:text-white focus:outline-none"
+                              value={finding.temuan}
+                              onChange={(e) => updateFinding(finding.id, { temuan: e.target.value })}
+                            >
+                              <option value="Kebersihan">Kebersihan</option>
+                              <option value="Kerusakan Fisik">Kerusakan Fisik</option>
+                              <option value="Kelistrikan">Kelistrikan</option>
+                              <option value="Lainnya">Lainnya</option>
+                            </select>
+                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="relative group overflow-hidden">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          capture="environment"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) updateFinding(finding.id, { foto_temuan: file });
+                          }}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        />
+                        <div className={`w-full py-6 border border-dashed rounded-3xl flex items-center justify-center gap-3 transition-all ${
+                          finding.foto_temuan 
+                            ? "bg-success/5 border-success/30 text-success" 
+                            : "bg-white dark:bg-white/5 border-zinc-300 dark:border-white/10 text-zinc-500 dark:text-white/30"
+                        }`}>
+                          <Camera className="w-5 h-5" />
+                          <span className="text-[9px] font-black uppercase tracking-widest">
+                            {finding.foto_temuan ? 'Foto Terlampir' : 'Lampirkan Foto Temuan'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {findings.length === 0 && (
+                  <div className="p-8 text-center bg-zinc-100 dark:bg-white/5 rounded-[2rem] border border-dashed border-zinc-200 dark:border-white/10">
+                    <p className="text-[10px] text-zinc-400 dark:text-white/20 font-bold uppercase">Ketuk &quot;Tambah Temuan&quot; jika ada masalah di lokasi</p>
+                  </div>
+                )}
+              </div>
+            </section>
 
             {/* Submission Logic Display */}
             <div className="pt-6 space-y-4">
                {!validation.isTimeReached && (
                  <div className="p-4 rounded-2xl bg-secondary/5 border border-secondary/20 flex items-center gap-3">
                    <Clock className="w-4 h-4 text-secondary animate-pulse" />
-                   <p className="text-[10px] font-bold text-white/60 uppercase tracking-widest">
+                   <p className="text-[10px] font-bold text-zinc-800 dark:text-white/60 uppercase tracking-widest">
                      Laporan dapat dikirim dalam <span className="text-secondary">{formatTime(remainingSeconds)}</span>
                    </p>
                  </div>
