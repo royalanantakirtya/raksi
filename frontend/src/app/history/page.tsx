@@ -57,7 +57,7 @@ export default function HistoryPage() {
       <div className="flex items-center justify-between">
         <button
           onClick={() => router.back()}
-          className="p-2 rounded-xl bg-white/5 border border-white/10 text-white/70 active:scale-95 transition-all text-xs flex items-center gap-2"
+          className="p-2 rounded-xl bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white/70 active:scale-95 transition-all text-xs flex items-center gap-2"
         >
           <ChevronLeft className="w-4 h-4" /> Kembali
         </button>
