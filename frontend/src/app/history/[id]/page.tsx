@@ -71,7 +71,7 @@ export default function VisitDetailPage() {
       <div className="flex items-center justify-between">
         <button
           onClick={() => router.back()}
-          className="p-2.5 rounded-2xl bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-white/70 active:scale-95 transition-all text-xs flex items-center gap-2"
+          className="p-2.5 rounded-2xl bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white/70 active:scale-95 transition-all text-xs flex items-center gap-2"
         >
           <ChevronLeft className="w-4 h-4" /> Kembali
         </button>
@@ -171,9 +171,9 @@ export default function VisitDetailPage() {
                         <span className="text-[9px] font-black text-zinc-700 dark:text-white/70 uppercase tracking-tighter">Lihat Foto</span>
                       </button>
                     ) : (
-                      <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase ${resp.value === 'Ya' || resp.value === 'Ok' || resp.value === 'Baik' ? 'bg-success/20 text-success border border-success/10' : 'bg-secondary/20 text-secondary border border-secondary/10'}`}>
-                        {resp.value}
-                      </span>
+                        <span className="px-4 py-1.5 rounded-xl text-[10px] font-black uppercase text-success bg-success/10 border border-success/10 dark:text-secondary dark:bg-secondary/10 dark:border-secondary/20">
+                          {resp.value}
+                        </span>
                     )}
                   </div>
                 </div>
