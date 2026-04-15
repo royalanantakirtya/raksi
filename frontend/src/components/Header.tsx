@@ -36,7 +36,7 @@ export default function Header() {
   if (pathname === '/login') return null;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 bg-primary text-white px-4 py-3 shadow-lg flex justify-between items-center h-16">
+    <header className="fixed top-0 left-0 right-0 z-40 bg-primary dark:bg-surface text-white px-4 py-3 shadow-lg flex justify-between items-center h-16">
       <div className="flex items-center gap-3">
         <div className="bg-white p-1 rounded-sm w-24 h-10 flex items-center justify-center">
           <Image 
@@ -51,8 +51,8 @@ export default function Header() {
 
       <div className="flex items-center gap-3">
         <div className="text-right hidden xs:block">
-          <p className="text-[10px] text-white/60 uppercase tracking-wider">Selamat Datang</p>
-          <p className="text-xs font-semibold">{userName}</p>
+          <p className="text-[10px] text-white/50 uppercase tracking-wider">Selamat Datang</p>
+          <p className="text-xs font-black uppercase tracking-tight">{userName}</p>
         </div>
         <div className="flex items-center gap-2">
           <button 

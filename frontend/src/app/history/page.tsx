@@ -68,21 +68,21 @@ export default function HistoryPage() {
 
       <div className="space-y-4">
         <section className="space-y-1">
-          <h2 className="text-2xl font-black tracking-tight text-white uppercase">Pekerjaan Saya</h2>
-          <p className="text-xs text-white/40 font-bold uppercase tracking-widest">Daftar kunjungan yang telah diselesaikan</p>
+          <h2 className="text-2xl font-black tracking-tight text-zinc-800 dark:text-white uppercase">Pekerjaan Saya</h2>
+          <p className="text-xs text-zinc-500 dark:text-white/40 font-bold uppercase tracking-widest">Daftar kunjungan yang telah diselesaikan</p>
         </section>
 
         {/* Tab Switcher */}
-        <div className="flex p-1 bg-white/5 rounded-2xl border border-white/5">
+        <div className="flex p-1 bg-zinc-100 dark:bg-white/5 rounded-2xl border border-zinc-200 dark:border-white/5">
           <button 
             onClick={() => setTab('server')}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${tab === 'server' ? 'bg-secondary text-white shadow-lg' : 'text-white/40'}`}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${tab === 'server' ? 'bg-secondary text-white shadow-lg' : 'text-zinc-500 dark:text-white/40'}`}
           >
             <Database className="w-3.5 h-3.5" /> Database
           </button>
           <button 
             onClick={() => setTab('local')}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${tab === 'local' ? 'bg-secondary text-white shadow-lg' : 'text-white/40'}`}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${tab === 'local' ? 'bg-secondary text-white shadow-lg' : 'text-zinc-500 dark:text-white/40'}`}
           >
             <Smartphone className="w-3.5 h-3.5" /> Log Lokal
           </button>
@@ -129,14 +129,14 @@ export default function HistoryPage() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-3 pt-2">
-                    <div className="bg-white/5 p-3 rounded-2xl border border-white/5">
-                      <p className="text-[9px] text-white/30 uppercase font-black tracking-widest mb-1">Status</p>
+                    <div className="bg-white/10 p-3 rounded-2xl border border-white/10">
+                      <p className="text-[9px] text-white/50 uppercase font-black tracking-widest mb-1">Status</p>
                       <p className="text-[10px] text-white font-bold uppercase">
                         {visit.responses?.length || 0} Param / {visit.findings?.length || 0} Temuan
                       </p>
                     </div>
-                    <div className="bg-white/5 p-3 rounded-2xl border border-white/5">
-                      <p className="text-[9px] text-white/30 uppercase font-black tracking-widest mb-1">Durasi</p>
+                    <div className="bg-white/10 p-3 rounded-2xl border border-white/10">
+                      <p className="text-[9px] text-white/50 uppercase font-black tracking-widest mb-1">Durasi</p>
                       <p className="text-[10px] text-white font-bold uppercase">{visit.durasi || "-"}</p>
                     </div>
                   </div>
@@ -146,9 +146,9 @@ export default function HistoryPage() {
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="p-4 bg-accent/20 border border-accent/20 rounded-2xl flex gap-3 items-start">
-               <Info className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
-               <p className="text-[10px] text-accent leading-relaxed font-bold uppercase">
+            <div className="p-4 bg-secondary/10 border border-secondary/20 rounded-2xl flex gap-3 items-start">
+               <Info className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
+               <p className="text-[10px] text-zinc-600 dark:text-accent leading-relaxed font-bold uppercase">
                  Log lokal menyimpan bukti pengiriman 48 jam terakhir sebagai antisipasi kendala sinkronisasi.
                </p>
             </div>
@@ -160,29 +160,29 @@ export default function HistoryPage() {
                </div>
             ) : (
               localLogs.map((log) => (
-                <div key={log.id} className="bg-white/5 p-5 rounded-3xl border border-white/10 space-y-3">
+                <div key={log.id} className="bg-zinc-100 dark:bg-white/5 p-5 rounded-3xl border border-zinc-200 dark:border-white/10 space-y-3">
                   <div className="flex justify-between items-start">
                     <div className="space-y-1">
-                      <h4 className="text-xs font-black text-white uppercase">{log.location_name}</h4>
-                      <p className="text-[9px] text-white/40 font-bold tracking-widest uppercase">ID: {log.kode_kunjungan}</p>
+                      <h4 className="text-xs font-black text-zinc-800 dark:text-white uppercase">{log.location_name}</h4>
+                      <p className="text-[9px] text-zinc-500 dark:text-white/40 font-bold tracking-widest uppercase">ID: {log.kode_kunjungan}</p>
                     </div>
-                    <span className="text-[9px] font-black bg-white/10 text-white/70 px-2 py-1 rounded-lg">
+                    <span className="text-[9px] font-black bg-white/10 dark:bg-white/10 text-zinc-600 dark:text-white/70 px-2 py-1 rounded-lg border border-zinc-200 dark:border-white/10">
                       {new Date(log.submitted_at).toLocaleTimeString()}
                     </span>
                   </div>
                   
-                  <div className="h-px bg-white/5 w-full" />
+                  <div className="h-px bg-zinc-200 dark:bg-white/5 w-full" />
                   
                   <div className="flex gap-4">
                     <div className="flex items-center gap-1.5">
-                      <div className="w-1.5 h-1.5 rounded-full bg-secondary shadow-[0_0_5px_rgba(255,200,0,0.5)]" />
-                      <span className="text-[9px] text-white/60 font-black uppercase tracking-tighter">
+                      <div className="w-1.5 h-1.5 rounded-full bg-secondary shadow-[0_0_5px_rgba(214,181,117,0.5)]" />
+                      <span className="text-[9px] text-zinc-500 dark:text-white/60 font-black uppercase tracking-tighter">
                         {log.responses?.length || 0} Param
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <div className="w-1.5 h-1.5 rounded-full bg-accent shadow-[0_0_5px_rgba(255,255,255,0.5)]" />
-                      <span className="text-[9px] text-white/60 font-black uppercase tracking-tighter">
+                      <div className="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-accent shadow-[0_0_5px_rgba(150,150,150,0.5)]" />
+                      <span className="text-[9px] text-zinc-500 dark:text-white/60 font-black uppercase tracking-tighter">
                         {log.findings?.length || 0} Temuan
                       </span>
                     </div>

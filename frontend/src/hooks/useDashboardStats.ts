@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import scheduleService from "../services/scheduleService";
 import visitRequestService from "../services/visitRequestService";
 import newsService from "../services/newsService";
-import { VisitRequest, NewsItem } from "@/types/index";
+import { VisitRequest, NewsItem, Schedule } from "@/types/index";
 
 interface DashboardStats {
   total: number;
@@ -25,22 +25,22 @@ export function useDashboardStats() {
   const fetchStats = async () => {
     setIsLoading(true);
     try {
-      const [schedulesData, requestsData, newsRaw] = await Promise.all([
-        scheduleService.getToday(),
+      const [openSchedulesData, closedSchedulesData, requestsData, newsRaw] = await Promise.all([
+        scheduleService.getToday("open"),
+        scheduleService.getToday("closed"),
         visitRequestService.getAll(),
         newsService.getAll(),
       ]);
-
-      const schedules = (schedulesData as { data?: unknown[] })?.data ?? (Array.isArray(schedulesData) ? schedulesData : []);
-      
-      const requests = (requestsData as { data?: unknown[] })?.data ?? (Array.isArray(requestsData) ? requestsData : []);
-      
-      const newsItems = (newsRaw as { data?: unknown[] })?.data ?? (Array.isArray(newsRaw) ? newsRaw : []);
-
+ 
+      const openSchedules = (openSchedulesData as { data?: Schedule[] })?.data ?? (Array.isArray(openSchedulesData) ? openSchedulesData : []);
+      const closedSchedules = (closedSchedulesData as { data?: Schedule[] })?.data ?? (Array.isArray(closedSchedulesData) ? closedSchedulesData : []);
+      const requests = (requestsData as { data?: VisitRequest[] })?.data ?? (Array.isArray(requestsData) ? requestsData : []);
+      const newsItems = (newsRaw as { data?: NewsItem[] })?.data ?? (Array.isArray(newsRaw) ? newsRaw : []);
+ 
       setStats({
-        total: schedules.length,
-        completed: 0, // Will be updated in later iteration
-        pending: schedules.length,
+        total: openSchedules.length + closedSchedules.length,
+        completed: closedSchedules.length,
+        pending: openSchedules.length,
         unplanned_requests: requests.length,
       });
 

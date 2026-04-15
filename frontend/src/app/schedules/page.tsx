@@ -89,7 +89,7 @@ export default function SchedulesPage() {
         <motion.h2 variants={item} className="text-zinc-800 dark:text-white text-2xl font-bold tracking-tight">
           Jadwal <span className="gold-text-dark dark:gold-text uppercase">Kunjungan</span>
         </motion.h2>
-        <motion.p variants={item} className="text-zinc-500 dark:text-accent text-xs font-medium">
+        <motion.p variants={item} className="text-zinc-500 dark:text-accent text-xs font-bold tracking-widest uppercase">
           Daftar lokasi yang harus dikunjungi hari ini
         </motion.p>
       </section>
@@ -119,9 +119,9 @@ export default function SchedulesPage() {
         )}
 
         {filteredSchedules.length === 0 ? (
-          <div className="text-center py-20 maroon-gradient rounded-[2rem] border border-white/10 shadow-lg">
-            <Calendar className="w-12 h-12 text-accent/20 mx-auto mb-3" />
-            <p className="text-accent/60 text-sm">Tidak ada jadwal yang ditemukan</p>
+          <div className="text-center py-20 bg-zinc-100 dark:maroon-gradient rounded-[2rem] border border-zinc-200 dark:border-white/10 shadow-lg">
+            <Calendar className="w-12 h-12 text-zinc-300 dark:text-accent/20 mx-auto mb-3" />
+            <p className="text-zinc-400 dark:text-accent/60 text-sm font-bold uppercase tracking-widest">Tidak ada jadwal ditemukan</p>
           </div>
         ) : (
           filteredSchedules.map((schedule) => (
