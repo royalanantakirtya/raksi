@@ -8,7 +8,14 @@ const withSerwist = withSerwistInit({
 });
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'http://localhost:8000/api/:path*',
+      },
+    ];
+  },
 };
 
 export default withSerwist(nextConfig);
