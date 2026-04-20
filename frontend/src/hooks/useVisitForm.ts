@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import * as visitService from "../services/visitService";
+import { compressImage } from "../lib/imageCompression";
 
 // Define 'Schedule' and 'VisitType'
 interface ChecklistTemplate {
@@ -77,6 +78,7 @@ export function useVisitForm(
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [isCompressing, setIsCompressing] = useState(false);
 
   // Time tracking
   const [startTime] = useState<Date>(new Date());
@@ -109,11 +111,24 @@ export function useVisitForm(
       });
   }, [scheduleId, locationId, visitTypeId]);
 
-  const handleInputChange = (id: string, value: string | number | File) => {
-    setResponses(prev => ({
-      ...prev,
-      [id]: value
-    }));
+  const handleInputChange = async (id: string, value: string | number | File) => {
+    if (value instanceof File && value.type.startsWith('image/')) {
+      setIsCompressing(true);
+      try {
+        const compressed = await compressImage(value);
+        setResponses(prev => ({ ...prev, [id]: compressed }));
+      } catch (err) {
+        console.error("Compression error:", err);
+        setResponses(prev => ({ ...prev, [id]: value })); // Fallback
+      } finally {
+        setIsCompressing(false);
+      }
+    } else {
+      setResponses(prev => ({
+        ...prev,
+        [id]: value
+      }));
+    }
   };
 
   const addFinding = () => {
@@ -126,8 +141,21 @@ export function useVisitForm(
     setFindings(prev => [...prev, newFinding]);
   };
 
-  const updateFinding = (id: string, data: Partial<ChecklistFinding>) => {
-    setFindings(prev => prev.map(f => f.id === id ? { ...f, ...data } : f));
+  const updateFinding = async (id: string, data: Partial<ChecklistFinding>) => {
+    if (data.foto_temuan instanceof File && data.foto_temuan.type.startsWith('image/')) {
+      setIsCompressing(true);
+      try {
+        const compressed = await compressImage(data.foto_temuan);
+        setFindings(prev => prev.map(f => f.id === id ? { ...f, ...data, foto_temuan: compressed } : f));
+      } catch (err) {
+        console.error("Compression error:", err);
+        setFindings(prev => prev.map(f => f.id === id ? { ...f, ...data } : f));
+      } finally {
+        setIsCompressing(false);
+      }
+    } else {
+      setFindings(prev => prev.map(f => f.id === id ? { ...f, ...data } : f));
+    }
   };
 
   const removeFinding = (id: string) => {
@@ -155,7 +183,7 @@ export function useVisitForm(
       isVisualComplete,
       isFindingsValid,
       isTimeReached,
-      canSubmit: isKondisiComplete && isVisualComplete && isFindingsValid && isTimeReached
+      canSubmit: isKondisiComplete && isVisualComplete && isFindingsValid && isTimeReached && !isCompressing
     };
   };
 
@@ -273,6 +301,7 @@ export function useVisitForm(
     findings,
     isLoading,
     isSubmitting,
+    isCompressing,
     error,
     success,
     elapsedSeconds,

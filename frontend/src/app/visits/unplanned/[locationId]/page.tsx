@@ -14,6 +14,7 @@ import api from "@/lib/api";
 import { motion } from "framer-motion";
 
 import { Location, VisitType } from "@/types";
+import PageWrapper from "@/components/PageWrapper";
 
 export default function UnplannedVisitTypePage() {
   const params = useParams();
@@ -75,26 +76,13 @@ export default function UnplannedVisitTypePage() {
     );
   }
 
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
-  };
-
   const item = {
     hidden: { opacity: 0, y: 10 },
     show: { opacity: 1, y: 0 }
   };
 
   return (
-    <motion.div 
-      variants={container}
-      initial="hidden"
-      animate="show"
-      className="space-y-6"
-    >
+    <PageWrapper className="space-y-6">
       {/* Top Action Bar */}
       <div className="flex items-center justify-between">
         <button 
@@ -151,6 +139,6 @@ export default function UnplannedVisitTypePage() {
           </motion.div>
         ))}
       </div>
-    </motion.div>
+    </PageWrapper>
   );
 }

@@ -16,6 +16,7 @@ import api from "@/lib/api";
 import { motion } from "framer-motion";
 
 import { Schedule } from "@/types";
+import PageWrapper from "@/components/PageWrapper";
 
 export default function SchedulesPage() {
   const router = useRouter();
@@ -64,26 +65,13 @@ export default function SchedulesPage() {
     );
   }
 
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.05 }
-    }
-  };
-
   const item = {
     hidden: { opacity: 0, x: -10 },
     show: { opacity: 1, x: 0 }
   };
 
   return (
-    <motion.div 
-      variants={container}
-      initial="hidden"
-      animate="show"
-      className="space-y-6"
-    >
+    <PageWrapper className="space-y-6">
       {/* Header Info */}
       <section className="space-y-1">
         <motion.h2 variants={item} className="text-zinc-800 dark:text-white text-2xl font-bold tracking-tight">
@@ -175,8 +163,6 @@ export default function SchedulesPage() {
         )}
       </div>
 
-      {/* Spacer for bottom nav */}
-      <div className="h-4" />
-    </motion.div>
+    </PageWrapper>
   );
 }

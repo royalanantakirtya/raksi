@@ -8,6 +8,12 @@ const withSerwist = withSerwistInit({
 });
 
 const nextConfig: NextConfig = {
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '50mb',
+    },
+    proxyClientMaxBodySize: '50mb',
+  },
   async rewrites() {
     return [
       {

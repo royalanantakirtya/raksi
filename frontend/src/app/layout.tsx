@@ -45,7 +45,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)]">
         <AuthGuard>
           <Header />
-          <main className="flex-1 pb-24 pt-20 px-4 max-w-lg mx-auto w-full">
+          <main className="flex-1 max-w-lg mx-auto w-full">
             {children}
           </main>
           <BottomNav />
