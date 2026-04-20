@@ -17,6 +17,7 @@ import api from "@/lib/api";
 import { Visit } from "@/types";
 
 import { VisitLog } from "@/hooks/useVisitForm";
+import PageWrapper from "@/components/PageWrapper";
 
 export default function HistoryPage() {
   const router = useRouter();
@@ -52,7 +53,7 @@ export default function HistoryPage() {
   };
 
   return (
-    <div className="space-y-6 pb-20">
+    <PageWrapper className="space-y-6">
       {/* Header Bar */}
       <div className="flex items-center justify-between">
         <button
@@ -193,6 +194,6 @@ export default function HistoryPage() {
           </div>
         )}
       </div>
-    </div>
+    </PageWrapper>
   );
 }

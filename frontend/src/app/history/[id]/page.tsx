@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import api from "@/lib/api";
 import { Visit } from "@/types";
+import PageWrapper from "@/components/PageWrapper";
 
 export default function VisitDetailPage() {
   const { id } = useParams();
@@ -66,7 +67,7 @@ export default function VisitDetailPage() {
   }
 
   return (
-    <div className="space-y-6 pb-20 max-w-lg mx-auto">
+    <PageWrapper className="space-y-6">
       {/* Header Overlay */}
       <div className="flex items-center justify-between">
         <button
@@ -237,6 +238,6 @@ export default function VisitDetailPage() {
           </div>
         )}
       </section>
-    </div>
+    </PageWrapper>
   );
 }

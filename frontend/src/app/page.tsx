@@ -9,12 +9,12 @@ import {
   Clock,
   MapPin,
   ChevronRight,
-  TrendingUp,
   Bell,
   Info,
 } from "lucide-react";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
 import { useAuth } from "@/hooks/useAuth";
+import PageWrapper from "@/components/PageWrapper";
 
 export default function Home() {
   const router = useRouter();
@@ -30,16 +30,6 @@ export default function Home() {
     );
   }
 
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
   const item = {
     hidden: { opacity: 0, y: 10 },
     show: { opacity: 1, y: 0 },
@@ -49,12 +39,7 @@ export default function Home() {
   const userName = user?.nama_user?.split(" ")[0] || "Guest";
 
   return (
-    <motion.div
-      variants={container}
-      initial="hidden"
-      animate="show"
-      className="space-y-6"
-    >
+    <PageWrapper className="space-y-4">
       {/* Welcome Section */}
       <section className="space-y-1">
         <motion.p
@@ -80,32 +65,32 @@ export default function Home() {
       </section>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-3">
         <motion.div
           variants={item}
-          className="maroon-gradient p-4 rounded-3xl border border-white/10 shadow-lg space-y-3"
+          className="maroon-gradient p-3 rounded-2xl border border-white/10 shadow-lg flex items-center gap-3"
         >
-          <div className="w-10 h-10 rounded-2xl bg-secondary/10 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-secondary/10 flex-shrink-0 flex items-center justify-center">
             <Calendar className="w-5 h-5 text-secondary" />
           </div>
           <div>
-            <p className="text-white text-3xl font-bold">{stats.total}</p>
-            <p className="text-[10px] text-white/50 uppercase font-bold tracking-wider">
-              Jadwal Hari Ini
+            <p className="text-white text-xl font-bold leading-none">{stats.total}</p>
+            <p className="text-[8px] text-white/50 uppercase font-bold tracking-wider mt-1">
+              Jadwal
             </p>
           </div>
         </motion.div>
 
         <motion.div
           variants={item}
-          className="maroon-gradient p-4 rounded-3xl border border-white/10 shadow-lg space-y-3"
+          className="maroon-gradient p-3 rounded-2xl border border-white/10 shadow-lg flex items-center gap-3"
         >
-          <div className="w-10 h-10 rounded-2xl bg-success/10 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-success/10 flex-shrink-0 flex items-center justify-center">
             <CheckCircle2 className="w-5 h-5 text-success" />
           </div>
           <div>
-            <p className="text-white text-3xl font-bold">{stats.completed}</p>
-            <p className="text-[10px] text-white/50 uppercase font-bold tracking-wider">
+            <p className="text-white text-xl font-bold leading-none">{stats.completed}</p>
+            <p className="text-[8px] text-white/50 uppercase font-bold tracking-wider mt-1">
               Selesai
             </p>
           </div>
@@ -117,21 +102,21 @@ export default function Home() {
         variants={item}
         whileTap={{ scale: 0.98 }}
         onClick={() => router.push("/schedules")}
-        className="maroon-gradient p-6 rounded-4xl shadow-xl relative overflow-hidden group cursor-pointer"
+        className="maroon-gradient p-4 rounded-3xl shadow-lg relative overflow-hidden group cursor-pointer"
       >
         <div className="absolute top-[-20%] right-[-10%] w-[50%] h-[150%] bg-white/5 rotate-12 group-hover:rotate-6 transition-transform duration-500" />
         <div className="relative z-10 flex items-center justify-between">
-          <div className="space-y-1">
-            <p className="text-white/70 text-xs font-bold uppercase tracking-widest">
+          <div className="space-y-0.5">
+            <p className="text-white/70 text-[9px] font-bold uppercase tracking-widest">
               Aksi Cepat
             </p>
-            <h3 className="text-xl font-bold text-white">Mulai Kunjungan</h3>
-            <p className="text-secondary text-xs">
+            <h3 className="text-lg font-bold text-white leading-tight">Mulai Kunjungan</h3>
+            <p className="text-secondary text-[10px]">
               {stats.pending} lokasi menanti Anda
             </p>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
-            <ChevronRight className="w-6 h-6 text-white" />
+          <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
+            <ChevronRight className="w-5 h-5 text-white" />
           </div>
         </div>
       </motion.div>
@@ -144,8 +129,8 @@ export default function Home() {
             Berita & Info Kantor
           </h3>
         </div>
-        <div className="maroon-gradient p-5 rounded-3xl border border-white/10 shadow-lg space-y-4">
-          {news.map((item) => (
+        <div className="maroon-gradient p-4 rounded-3xl border border-white/10 shadow-lg space-y-3 max-h-[160px] overflow-y-auto scrollbar-hide">
+          {news.length > 0 ? news.map((item) => (
             <div
               key={item.id}
               className="flex gap-4 group cursor-pointer border-b border-white/5 pb-4 last:border-0 last:pb-0"
@@ -169,7 +154,9 @@ export default function Home() {
                 </p>
               </div>
             </div>
-          ))}
+          )) : (
+            <p className="text-[10px] text-white/30 text-center py-4 uppercase font-bold tracking-widest italic">Tidak ada berita terbaru</p>
+          )}
         </div>
       </motion.section>
 
@@ -272,10 +259,6 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 pt-2 text-xs text-secondary/80">
-            <TrendingUp className="w-4 h-4" />
-            <p>Ayo selesaikan kunjungan hari ini tepat waktu!</p>
-          </div>
         </div>
       </motion.section>
 
@@ -305,6 +288,6 @@ export default function Home() {
           </span>
         </button>
       </motion.section>
-    </motion.div>
+    </PageWrapper>
   );
 }

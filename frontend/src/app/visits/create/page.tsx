@@ -17,6 +17,7 @@ import {
   Clock,
 } from "lucide-react";
 import { useVisitForm } from "@/hooks/useVisitForm";
+import PageWrapper from "@/components/PageWrapper";
 
 interface ChecklistField {
   id: number;
@@ -40,6 +41,7 @@ function VisitCreateContent() {
     findings,
     isLoading,
     isSubmitting,
+    isCompressing,
     error,
     success,
     elapsedSeconds,
@@ -89,7 +91,7 @@ function VisitCreateContent() {
   const visualFields = template.checklist_templates?.filter((f: ChecklistField) => f.field_type === 'file') || [];
 
   return (
-    <div className="space-y-6 pb-24">
+    <PageWrapper className="space-y-6">
       {/* Header Action Bar */}
       <div className="flex items-center justify-between">
         <button
@@ -244,6 +246,11 @@ function VisitCreateContent() {
                               <CheckCircle2 className="w-8 h-8" />
                               <p className="text-[9px] font-black uppercase tracking-widest">Foto Tersimpan</p>
                             </>
+                          ) : isCompressing ? (
+                            <>
+                              <Loader2 className="w-8 h-8 animate-spin text-secondary" />
+                              <p className="text-[9px] font-black uppercase tracking-widest">Mengompresi...</p>
+                            </>
                           ) : (
                             <>
                               <Camera className="w-8 h-8 mb-1" />
@@ -331,9 +338,13 @@ function VisitCreateContent() {
                             ? "bg-success/5 border-success/30 text-success" 
                             : "bg-white dark:bg-white/5 border-zinc-300 dark:border-white/10 text-zinc-500 dark:text-white/30"
                         }`}>
-                          <Camera className="w-5 h-5" />
+                          {isCompressing ? (
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                          ) : (
+                            <Camera className="w-5 h-5" />
+                          )}
                           <span className="text-[9px] font-black uppercase tracking-widest">
-                            {finding.foto_temuan ? 'Foto Terlampir' : 'Lampirkan Foto Temuan'}
+                            {isCompressing ? 'Mengompresi...' : (finding.foto_temuan ? 'Foto Terlampir' : 'Lampirkan Foto Temuan')}
                           </span>
                         </div>
                       </div>
@@ -371,15 +382,20 @@ function VisitCreateContent() {
 
               <button
                 type="submit"
-                disabled={isSubmitting || !validation.canSubmit}
+                disabled={isSubmitting || isCompressing || !validation.canSubmit}
                 className={`w-full py-6 rounded-3xl text-white font-black text-sm uppercase tracking-[0.3em] shadow-[0_20px_50px_rgba(150,0,0,0.3)] flex items-center justify-center gap-3 active:scale-[0.98] transition-all ${
-                  isSubmitting || !validation.canSubmit 
+                  isSubmitting || isCompressing || !validation.canSubmit 
                     ? "bg-zinc-800 text-white/20 cursor-not-allowed shadow-none border border-white/5" 
                     : "maroon-gradient shadow-[0_20px_50px_rgba(150,0,0,0.3)]"
                 }`}
               >
                 {isSubmitting ? (
                   <Loader2 className="w-6 h-6 animate-spin" />
+                ) : isCompressing ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>Mengompresi...</span>
+                  </>
                 ) : (
                   <>
                     {!validation.canSubmit && <Clock className="w-5 h-5" />}
@@ -392,7 +408,7 @@ function VisitCreateContent() {
           </form>
         )}
       </div>
-    </div>
+    </PageWrapper>
   );
 }
 

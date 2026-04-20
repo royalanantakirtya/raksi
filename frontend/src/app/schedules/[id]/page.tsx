@@ -16,6 +16,7 @@ import api from "@/lib/api";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Schedule } from "@/types";
+import PageWrapper from "@/components/PageWrapper";
 
 // Haversine Formula for distance calculation
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -132,7 +133,7 @@ export default function ScheduleDetailPage() {
   const isWithinRadius = process.env.NODE_ENV === 'development' || (distance !== null && distance <= GEOFENCE_RADIUS);
 
   return (
-    <div className="space-y-6 pb-12">
+    <PageWrapper className="space-y-6">
       {/* Top Action Bar */}
       <div className="flex items-center justify-between">
         <button 
@@ -257,6 +258,6 @@ export default function ScheduleDetailPage() {
           Mulai Kunjungan
         </button>
       </motion.div>
-    </div>
+    </PageWrapper>
   );
 }

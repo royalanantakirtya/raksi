@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import PageWrapper from "@/components/PageWrapper";
 
 export interface UserSession {
   id: number;
@@ -77,26 +78,13 @@ export default function MorePage() {
     },
   ];
 
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.05 }
-    }
-  };
-
   const item = {
     hidden: { opacity: 0, x: -10 },
     show: { opacity: 1, x: 0 }
   };
 
   return (
-    <motion.div 
-      variants={container}
-      initial="hidden"
-      animate="show"
-      className="space-y-6 pb-20"
-    >
+    <PageWrapper className="space-y-6">
       {/* Top Header */}
       <div className="flex items-center justify-between">
         <button 
@@ -171,6 +159,6 @@ export default function MorePage() {
       <div className="text-center pt-4">
         <p className="text-[10px] text-white/20 uppercase tracking-[0.3em] font-medium">Developed by RAK Team</p>
       </div>
-    </motion.div>
+    </PageWrapper>
   );
 }
