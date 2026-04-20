@@ -72,6 +72,8 @@ export default function LoginPage() {
               width={160}
               height={50}
               className="object-contain"
+              style={{ height: 'auto' }}
+              priority
             />
           </div>
           <h1 className="gold-text-dark dark:gold-text text-3xl font-bold tracking-tight uppercase">

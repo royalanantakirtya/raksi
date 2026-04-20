@@ -18,8 +18,14 @@ class EloquentVisitRepository implements VisitRepositoryInterface
             ->findOrFail($id);
     }
 
-    public function getAll(): Collection
+    public function getAll(?int $userId = null): Collection
     {
-        return Visit::with(['user', 'location', 'visitType', 'responses.template', 'findings'])->latest()->get();
+        $query = Visit::with(['user', 'location', 'visitType', 'responses.template', 'findings']);
+        
+        if ($userId) {
+            $query->where('user_id', $userId);
+        }
+
+        return $query->latest()->get();
     }
 }

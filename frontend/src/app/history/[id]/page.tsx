@@ -14,7 +14,7 @@ import {
   Tag
 } from "lucide-react";
 import api from "@/lib/api";
-import { Visit } from "@/types";
+import { Visit, VisitResponse, Finding } from "@/types";
 import PageWrapper from "@/components/PageWrapper";
 
 export default function VisitDetailPage() {
@@ -145,18 +145,28 @@ export default function VisitDetailPage() {
         
         <div className="space-y-3">
           {visit.responses && visit.responses.length > 0 ? (
-            visit.responses.map((resp) => {
-              // Robust file check: includes uploads/ OR is a common image extension
-              const val = (resp.value || "").trim();
+            visit.responses.map((resp: VisitResponse) => {
+              // Robust file check: contains path indicators OR has image extension
+              const val = (resp.value || "").toString().trim();
               const isFile = val.includes('uploads/') || 
                              val.includes('storage/') || 
                              /\.(jpg|jpeg|png|webp|gif|bmp)$/i.test(val);
               
               const getFileUrl = (path: string) => {
+                if (!path) return "";
                 if (path.startsWith('http')) return path;
-                const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:8000';
-                const cleanPath = path.replace(/^storage\//, '').replace(/^\/storage\//, '');
-                return `${baseUrl}/storage/${cleanPath}`;
+                
+                // Get base API URL and normalize it to get the storage base
+                const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+                const storageBase = apiBase.replace(/\/api\/?$/, '');
+                
+                // Clean the path from redundant prefixes
+                const cleanPath = path.replace(/^(storage\/|uploads\/)/, 'uploads/')
+                                     .replace(/^\//, '');
+                
+                // If the path already has 'uploads/', it should be accessed via '/storage/uploads/...'
+                // because public/storage -> storage/app/public
+                return `${storageBase}/storage/${cleanPath}`;
               };
 
               return (
@@ -200,12 +210,18 @@ export default function VisitDetailPage() {
 
         {visit.findings && visit.findings.length > 0 ? (
           <div className="space-y-4">
-            {visit.findings.map((finding) => {
+            {visit.findings.map((finding: Finding) => {
               const getFileUrl = (path: string) => {
+                if (!path) return "";
                 if (path.startsWith('http')) return path;
-                const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:8000';
-                const cleanPath = path.replace(/^storage\//, '').replace(/^\/storage\//, '');
-                return `${baseUrl}/storage/${cleanPath}`;
+                
+                const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+                const storageBase = apiBase.replace(/\/api\/?$/, '');
+                
+                const cleanPath = path.replace(/^(storage\/|uploads\/)/, 'uploads/')
+                                     .replace(/^\//, '');
+                
+                return `${storageBase}/storage/${cleanPath}`;
               };
 
               return (

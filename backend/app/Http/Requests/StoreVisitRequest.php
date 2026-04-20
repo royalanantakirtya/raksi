@@ -25,7 +25,8 @@ class StoreVisitRequest extends FormRequest
       'durasi'                  => 'nullable|string',
       'responses'               => 'required|array',
       'responses.*.template_id' => 'required|exists:checklist_templates,id',
-      'responses.*.value'       => 'nullable',
+      'responses.*.value'       => 'nullable', // Flexible for string or file
+
       // Findings support
       'findings'                => 'nullable|array',
       'findings.*.temuan'       => 'required|string',

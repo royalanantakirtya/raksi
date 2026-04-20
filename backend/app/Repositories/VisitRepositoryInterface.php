@@ -9,5 +9,5 @@ interface VisitRepositoryInterface
 {
     public function create(array $data): Visit;
     public function findById(int $id): Visit;
-    public function getAll(): Collection;
+    public function getAll(?int $userId = null): Collection;
 }

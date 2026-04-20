@@ -13,10 +13,9 @@ class VisitController extends Controller
 {
     public function __construct(private VisitService $visitService) {}
 
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
-        // Calling fetchAllVisits explicitly to bypass any caching issues
-        $visits = $this->visitService->fetchAllVisits();
+        $visits = $this->visitService->fetchAllVisits($request->user()->id);
         return VisitResource::collection($visits);
     }
 

@@ -1,0 +1,16 @@
+/vendor
+/.env
+/.env.backup
+/.env.production
+/composer.lock
+/package-lock.json
+/public/storage
+/storage/*.key
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/testing/*
+/storage/framework/views/*
+/storage/logs/*
+/node_modules
+/.phpunit.result.cache
+/migrate_schedules.php
