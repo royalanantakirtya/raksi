@@ -147,12 +147,16 @@ export default function VisitDetailPage() {
           {visit.responses && visit.responses.length > 0 ? (
             visit.responses.map((resp) => {
               // Robust file check: includes uploads/ OR is a common image extension
-              const val = resp.value || "";
-              const isFile = val.includes('uploads/') || /\.(jpg|jpeg|png|webp|gif|bmp)$/i.test(val);
+              const val = (resp.value || "").trim();
+              const isFile = val.includes('uploads/') || 
+                             val.includes('storage/') || 
+                             /\.(jpg|jpeg|png|webp|gif|bmp)$/i.test(val);
               
               const getFileUrl = (path: string) => {
+                if (path.startsWith('http')) return path;
                 const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:8000';
-                return `${baseUrl}/storage/${path}`;
+                const cleanPath = path.replace(/^storage\//, '').replace(/^\/storage\//, '');
+                return `${baseUrl}/storage/${cleanPath}`;
               };
 
               return (
@@ -198,8 +202,10 @@ export default function VisitDetailPage() {
           <div className="space-y-4">
             {visit.findings.map((finding) => {
               const getFileUrl = (path: string) => {
+                if (path.startsWith('http')) return path;
                 const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:8000';
-                return `${baseUrl}/storage/${path}`;
+                const cleanPath = path.replace(/^storage\//, '').replace(/^\/storage\//, '');
+                return `${baseUrl}/storage/${cleanPath}`;
               };
 
               return (
