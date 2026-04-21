@@ -41,13 +41,11 @@ class VisitService
                 
                 // Handle file uploads in responses if passed as file objects
                 if ($value instanceof \Illuminate\Http\UploadedFile) {
-                    if ($value->isValid()) {
-                        $path = $value->store('uploads/responses', 'public');
-                        $value = $path;
-                    } else {
-                        \Log::error("File upload invalid for response. Error code: " . $value->getError() . ", Name: " . $value->getClientOriginalName());
-                        $value = null;
+                    if (!$value->isValid()) {
+                        throw new \Exception("Gagal mengunggah file responses: " . $value->getErrorMessage());
                     }
+                    $path = $value->store('uploads/responses', 'public');
+                    $value = $path;
                 }
 
                 VisitResponse::create([
@@ -62,11 +60,10 @@ class VisitService
                 foreach ($data['findings'] as $findingData) {
                     $fotoPath = null;
                     if (isset($findingData['foto_temuan']) && $findingData['foto_temuan'] instanceof \Illuminate\Http\UploadedFile) {
-                        if ($findingData['foto_temuan']->isValid()) {
-                            $fotoPath = $findingData['foto_temuan']->store('uploads/findings', 'public');
-                        } else {
-                            \Log::error("File upload invalid for finding. Error code: " . $findingData['foto_temuan']->getError());
+                        if (!$findingData['foto_temuan']->isValid()) {
+                            throw new \Exception("Gagal mengunggah foto temuan: " . $findingData['foto_temuan']->getErrorMessage());
                         }
+                        $fotoPath = $findingData['foto_temuan']->store('uploads/findings', 'public');
                     }
 
                     // Generate Ticket Number (Legacy style: UserID + YYMMDD + HHMMSS + Rand)
